@@ -1,0 +1,737 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0300D3E7D455D72AE812F81F /* PhotoPlating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735185B90C14D47C3874035B /* PhotoPlating.swift */; };
+		04FCF64C224A1B537123B698 /* standard-plate-09.png in Resources */ = {isa = PBXBuildFile; fileRef = 69443D86B62D3A1BE35697E0 /* standard-plate-09.png */; };
+		0C94722B91A63F86961D4308 /* MealCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BB51DAA67D0D3B05F380E7 /* MealCalendar.swift */; };
+		11028ED5384044336EB34E97 /* InstagramPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5789C4C01455E4F9F1D5BA3C /* InstagramPreview.swift */; };
+		1E3D1A9532639DCA2489BBE6 /* pudding.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 8E1A047CA53F3DA52BB09AB0 /* pudding.jpg */; };
+		223EBD5F775A0BA64234114C /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2513890E96E65F4E4E42751B /* OFL.txt */; };
+		25603A0AFFCBB8B60E51CEAB /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFAF42CD311A5800F8D2BF56 /* ShareViewController.swift */; };
+		25FF5986148061D176DC22E4 /* Meals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089F3A52C5CA4BFB4FE3EF2F /* Meals.swift */; };
+		271CA8E4E5E87998347E0D65 /* MealDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEAC080AE68AFCDD6893047 /* MealDetail.swift */; };
+		2A90EDC376E76190E10AA8AB /* CrumbIcon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5104F54CFF996B02D05137F6 /* CrumbIcon@3x.png */; };
+		2DC6E7A565D04BF5978150A5 /* standard-plate-05.png in Resources */ = {isa = PBXBuildFile; fileRef = DB569EAAB5B40AF92C5E0442 /* standard-plate-05.png */; };
+		2F9519C7FFBF6907C2A3757B /* BricolageGrotesque-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCAA1BADF4E8AD8929F9E871 /* BricolageGrotesque-Bold.ttf */; };
+		2FE1D5DA2A90A4CF0D092446 /* CrumbFace.png in Resources */ = {isa = PBXBuildFile; fileRef = 637DD52C5008DB806F40EAE7 /* CrumbFace.png */; };
+		2FF3DC0D6D18D8B772FCB244 /* standard-plate-02.png in Resources */ = {isa = PBXBuildFile; fileRef = C2028557F5AE7D10111A1566 /* standard-plate-02.png */; };
+		3A798999108BE564E21B2FDC /* InstagramPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5789C4C01455E4F9F1D5BA3C /* InstagramPreview.swift */; };
+		3C15CF2C1980B7B901A7E917 /* HomePlateEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDEC2B987BC1D23243456B8C /* HomePlateEditor.swift */; };
+		3CB9A8F36E52318DDDCF0DA0 /* standard-plate-11.png in Resources */ = {isa = PBXBuildFile; fileRef = 38E6AEBAEFD4BD94643CB928 /* standard-plate-11.png */; };
+		439963FCED8A874D669BF98A /* CrumbShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 64CF8BC822BD827FB10E03D3 /* CrumbShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		44EAA9A6BA8733662F1FB0AE /* carbonara.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A7A6D199E45B1BC2A910A8E8 /* carbonara.jpg */; };
+		4675FA946FA4F79B13909215 /* InstagramDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DB410A1761A9C6444101E5 /* InstagramDraft.swift */; };
+		4EE3B4A0F2BA524EEA8D037A /* MealEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23DC99CE273FD5333B8AED1A /* MealEditor.swift */; };
+		58E4C42C14B37673432D1013 /* standard-plate-01.png in Resources */ = {isa = PBXBuildFile; fileRef = D29806B4470FB6A1D2C6D8E3 /* standard-plate-01.png */; };
+		5A1B602C55C4682F6A8424DC /* MealFolders.swift in Sources */ = {isa = PBXBuildFile; fileRef = A51035F9EB53B378C0022109 /* MealFolders.swift */; };
+		618E9D0BEBB9213D903F8A87 /* MealMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD88DCE49512DC0E412593C /* MealMap.swift */; };
+		67D5EB6FFFC95F8C30D003FF /* standard-plate-14.png in Resources */ = {isa = PBXBuildFile; fileRef = CDD13A3F8EA1FD28569D07CC /* standard-plate-14.png */; };
+		6B349C12351EE44D1158DEFF /* standard-plate-15.png in Resources */ = {isa = PBXBuildFile; fileRef = 20D5369C5B5299ACA39957BB /* standard-plate-15.png */; };
+		6F04E1566330622D56904463 /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4ED83DF6CDA85D73EAB9F2B /* Recipe.swift */; };
+		7F1B642E5EE64554DE8522F5 /* standard-plate-04.png in Resources */ = {isa = PBXBuildFile; fileRef = 648F6A22B2170FCB8B989AC8 /* standard-plate-04.png */; };
+		9929FD16D0E1FB70C42CE74E /* SharedMaps.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBD6F34B713941B0BEC0603 /* SharedMaps.swift */; };
+		9EE88062E389718B97E14005 /* standard-plate-07.png in Resources */ = {isa = PBXBuildFile; fileRef = DC723AE4C524F24BDAE43C94 /* standard-plate-07.png */; };
+		AE762F6E355E0BC7386D3D1C /* standard-plate-03.png in Resources */ = {isa = PBXBuildFile; fileRef = 88AF6C95E4FC5EC31F54156D /* standard-plate-03.png */; };
+		C1AE7DEE80E85FB48922B7E1 /* CrumbIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F5E27FF6C1EA56EF830F0977 /* CrumbIcon@2x.png */; };
+		C9766E69B1EAC7531920C479 /* standard-plate-12.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A5D132EF1D2FD80353FCB64 /* standard-plate-12.png */; };
+		CC86767C57C560BBC89F1B47 /* standard-plate-06.png in Resources */ = {isa = PBXBuildFile; fileRef = CF736F54F3C9CDCAC15F2A6A /* standard-plate-06.png */; };
+		D110C8D0BF653595886F83F1 /* PlatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789C188AF1D8FC49DBFD97 /* PlatePicker.swift */; };
+		D4E395E40BC8EAB6F903FB8C /* curry.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CBD199D2F417AE12A242034A /* curry.jpg */; };
+		E31D87EB5322C719B8BAD292 /* standard-plate-10.png in Resources */ = {isa = PBXBuildFile; fileRef = 53693BA4CD2731AB8132AAF3 /* standard-plate-10.png */; };
+		E78E0507F73985CE5F976166 /* standard-plate-13.png in Resources */ = {isa = PBXBuildFile; fileRef = C74F937674385FF2AF8E9F7C /* standard-plate-13.png */; };
+		E79270248AFF19FA4EB3966A /* WantedPlaceDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCA8B28C0C43F383C86C44B /* WantedPlaceDetail.swift */; };
+		E8F6D0734424CA0A79F8FE10 /* MealPhotoCropper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE58C5BCEDB9387350BE7D01 /* MealPhotoCropper.swift */; };
+		EF4F73740F3F2CE420373949 /* vegetables.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 6F356194DC133818BEB11B7E /* vegetables.jpg */; };
+		F34D47B6B098EF34C03FC8C3 /* standard-plate-08.png in Resources */ = {isa = PBXBuildFile; fileRef = 5C71A1B63A24A1E1E63EA0D4 /* standard-plate-08.png */; };
+		FCE5ABC48B41E154334FF336 /* InstagramDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DB410A1761A9C6444101E5 /* InstagramDraft.swift */; };
+		FF8B916E209E5797F8E4FAD5 /* CrumbApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 984FFCC51DE624CB37D589E5 /* CrumbApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		637884221010BAF70629F2DF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3C86C3999D71DA49210313DD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B8C781A99EF072D287E0A194;
+			remoteInfo = CrumbShare;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A0197BC0E4215D609E5328F9 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				439963FCED8A874D669BF98A /* CrumbShare.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		089F3A52C5CA4BFB4FE3EF2F /* Meals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meals.swift; sourceTree = "<group>"; };
+		0DD88DCE49512DC0E412593C /* MealMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealMap.swift; sourceTree = "<group>"; };
+		20D5369C5B5299ACA39957BB /* standard-plate-15.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-15.png"; sourceTree = "<group>"; };
+		23DC99CE273FD5333B8AED1A /* MealEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealEditor.swift; sourceTree = "<group>"; };
+		2513890E96E65F4E4E42751B /* OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
+		37D1685F11BBD93FC9E85F2D /* crumb.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = crumb.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		38E6AEBAEFD4BD94643CB928 /* standard-plate-11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-11.png"; sourceTree = "<group>"; };
+		5104F54CFF996B02D05137F6 /* CrumbIcon@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CrumbIcon@3x.png"; sourceTree = "<group>"; };
+		53693BA4CD2731AB8132AAF3 /* standard-plate-10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-10.png"; sourceTree = "<group>"; };
+		5789C4C01455E4F9F1D5BA3C /* InstagramPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramPreview.swift; sourceTree = "<group>"; };
+		5C71A1B63A24A1E1E63EA0D4 /* standard-plate-08.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-08.png"; sourceTree = "<group>"; };
+		637DD52C5008DB806F40EAE7 /* CrumbFace.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CrumbFace.png; sourceTree = "<group>"; };
+		63DB410A1761A9C6444101E5 /* InstagramDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramDraft.swift; sourceTree = "<group>"; };
+		648F6A22B2170FCB8B989AC8 /* standard-plate-04.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-04.png"; sourceTree = "<group>"; };
+		64CF8BC822BD827FB10E03D3 /* CrumbShare.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = CrumbShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		66789C188AF1D8FC49DBFD97 /* PlatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatePicker.swift; sourceTree = "<group>"; };
+		69443D86B62D3A1BE35697E0 /* standard-plate-09.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-09.png"; sourceTree = "<group>"; };
+		6F356194DC133818BEB11B7E /* vegetables.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = vegetables.jpg; sourceTree = "<group>"; };
+		735185B90C14D47C3874035B /* PhotoPlating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPlating.swift; sourceTree = "<group>"; };
+		88AF6C95E4FC5EC31F54156D /* standard-plate-03.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-03.png"; sourceTree = "<group>"; };
+		8A5D132EF1D2FD80353FCB64 /* standard-plate-12.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-12.png"; sourceTree = "<group>"; };
+		8E1A047CA53F3DA52BB09AB0 /* pudding.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = pudding.jpg; sourceTree = "<group>"; };
+		984FFCC51DE624CB37D589E5 /* CrumbApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrumbApp.swift; sourceTree = "<group>"; };
+		A51035F9EB53B378C0022109 /* MealFolders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealFolders.swift; sourceTree = "<group>"; };
+		A7A6D199E45B1BC2A910A8E8 /* carbonara.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = carbonara.jpg; sourceTree = "<group>"; };
+		C2028557F5AE7D10111A1566 /* standard-plate-02.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-02.png"; sourceTree = "<group>"; };
+		C74F937674385FF2AF8E9F7C /* standard-plate-13.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-13.png"; sourceTree = "<group>"; };
+		CBD199D2F417AE12A242034A /* curry.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = curry.jpg; sourceTree = "<group>"; };
+		CDD13A3F8EA1FD28569D07CC /* standard-plate-14.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-14.png"; sourceTree = "<group>"; };
+		CDEC2B987BC1D23243456B8C /* HomePlateEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePlateEditor.swift; sourceTree = "<group>"; };
+		CF736F54F3C9CDCAC15F2A6A /* standard-plate-06.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-06.png"; sourceTree = "<group>"; };
+		CFBD6F34B713941B0BEC0603 /* SharedMaps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedMaps.swift; sourceTree = "<group>"; };
+		D29806B4470FB6A1D2C6D8E3 /* standard-plate-01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-01.png"; sourceTree = "<group>"; };
+		DB569EAAB5B40AF92C5E0442 /* standard-plate-05.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-05.png"; sourceTree = "<group>"; };
+		DBEAC080AE68AFCDD6893047 /* MealDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealDetail.swift; sourceTree = "<group>"; };
+		DC723AE4C524F24BDAE43C94 /* standard-plate-07.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-07.png"; sourceTree = "<group>"; };
+		DCAA1BADF4E8AD8929F9E871 /* BricolageGrotesque-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BricolageGrotesque-Bold.ttf"; sourceTree = "<group>"; };
+		DCCA8B28C0C43F383C86C44B /* WantedPlaceDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WantedPlaceDetail.swift; sourceTree = "<group>"; };
+		F4BB51DAA67D0D3B05F380E7 /* MealCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealCalendar.swift; sourceTree = "<group>"; };
+		F4ED83DF6CDA85D73EAB9F2B /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
+		F5E27FF6C1EA56EF830F0977 /* CrumbIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CrumbIcon@2x.png"; sourceTree = "<group>"; };
+		FE58C5BCEDB9387350BE7D01 /* MealPhotoCropper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealPhotoCropper.swift; sourceTree = "<group>"; };
+		FFAF42CD311A5800F8D2BF56 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		2241C99C2082135002EB116F = {
+			isa = PBXGroup;
+			children = (
+				640409E50DA2EB8B411E4A10 /* Crumb */,
+				3A29D45450C5EA3ABC936ABC /* ShareExtension */,
+				E7085E17EBB24096EA3FC184 /* ShareInbox */,
+				D9089B3298336A8994569ACC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3A29D45450C5EA3ABC936ABC /* ShareExtension */ = {
+			isa = PBXGroup;
+			children = (
+				FFAF42CD311A5800F8D2BF56 /* ShareViewController.swift */,
+			);
+			path = ShareExtension;
+			sourceTree = "<group>";
+		};
+		451F96D334D2100644B06BD9 /* Samples */ = {
+			isa = PBXGroup;
+			children = (
+				A7A6D199E45B1BC2A910A8E8 /* carbonara.jpg */,
+				CBD199D2F417AE12A242034A /* curry.jpg */,
+				8E1A047CA53F3DA52BB09AB0 /* pudding.jpg */,
+				6F356194DC133818BEB11B7E /* vegetables.jpg */,
+			);
+			path = Samples;
+			sourceTree = "<group>";
+		};
+		589BFDEC5172F1022C6AD3BA /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				DCAA1BADF4E8AD8929F9E871 /* BricolageGrotesque-Bold.ttf */,
+				2513890E96E65F4E4E42751B /* OFL.txt */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		640409E50DA2EB8B411E4A10 /* Crumb */ = {
+			isa = PBXGroup;
+			children = (
+				984FFCC51DE624CB37D589E5 /* CrumbApp.swift */,
+				637DD52C5008DB806F40EAE7 /* CrumbFace.png */,
+				F5E27FF6C1EA56EF830F0977 /* CrumbIcon@2x.png */,
+				5104F54CFF996B02D05137F6 /* CrumbIcon@3x.png */,
+				CDEC2B987BC1D23243456B8C /* HomePlateEditor.swift */,
+				F4BB51DAA67D0D3B05F380E7 /* MealCalendar.swift */,
+				DBEAC080AE68AFCDD6893047 /* MealDetail.swift */,
+				23DC99CE273FD5333B8AED1A /* MealEditor.swift */,
+				A51035F9EB53B378C0022109 /* MealFolders.swift */,
+				0DD88DCE49512DC0E412593C /* MealMap.swift */,
+				FE58C5BCEDB9387350BE7D01 /* MealPhotoCropper.swift */,
+				089F3A52C5CA4BFB4FE3EF2F /* Meals.swift */,
+				735185B90C14D47C3874035B /* PhotoPlating.swift */,
+				66789C188AF1D8FC49DBFD97 /* PlatePicker.swift */,
+				F4ED83DF6CDA85D73EAB9F2B /* Recipe.swift */,
+				CFBD6F34B713941B0BEC0603 /* SharedMaps.swift */,
+				DCCA8B28C0C43F383C86C44B /* WantedPlaceDetail.swift */,
+				589BFDEC5172F1022C6AD3BA /* Fonts */,
+				451F96D334D2100644B06BD9 /* Samples */,
+				E6CD1DBC9D117B2BA5B4D971 /* StandardPlates */,
+			);
+			path = Crumb;
+			sourceTree = "<group>";
+		};
+		D9089B3298336A8994569ACC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				37D1685F11BBD93FC9E85F2D /* crumb.app */,
+				64CF8BC822BD827FB10E03D3 /* CrumbShare.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E6CD1DBC9D117B2BA5B4D971 /* StandardPlates */ = {
+			isa = PBXGroup;
+			children = (
+				D29806B4470FB6A1D2C6D8E3 /* standard-plate-01.png */,
+				C2028557F5AE7D10111A1566 /* standard-plate-02.png */,
+				88AF6C95E4FC5EC31F54156D /* standard-plate-03.png */,
+				648F6A22B2170FCB8B989AC8 /* standard-plate-04.png */,
+				DB569EAAB5B40AF92C5E0442 /* standard-plate-05.png */,
+				CF736F54F3C9CDCAC15F2A6A /* standard-plate-06.png */,
+				DC723AE4C524F24BDAE43C94 /* standard-plate-07.png */,
+				5C71A1B63A24A1E1E63EA0D4 /* standard-plate-08.png */,
+				69443D86B62D3A1BE35697E0 /* standard-plate-09.png */,
+				53693BA4CD2731AB8132AAF3 /* standard-plate-10.png */,
+				38E6AEBAEFD4BD94643CB928 /* standard-plate-11.png */,
+				8A5D132EF1D2FD80353FCB64 /* standard-plate-12.png */,
+				C74F937674385FF2AF8E9F7C /* standard-plate-13.png */,
+				CDD13A3F8EA1FD28569D07CC /* standard-plate-14.png */,
+				20D5369C5B5299ACA39957BB /* standard-plate-15.png */,
+			);
+			path = StandardPlates;
+			sourceTree = "<group>";
+		};
+		E7085E17EBB24096EA3FC184 /* ShareInbox */ = {
+			isa = PBXGroup;
+			children = (
+				63DB410A1761A9C6444101E5 /* InstagramDraft.swift */,
+				5789C4C01455E4F9F1D5BA3C /* InstagramPreview.swift */,
+			);
+			path = ShareInbox;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0693FF7C5ADE62C6D99F1704 /* crumb */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F36CD738730281322C6D18A4 /* Build configuration list for PBXNativeTarget "crumb" */;
+			buildPhases = (
+				F1A62D0A1725B8D2C3A51EAA /* Sources */,
+				A39A1BD925DF3B5EF7335723 /* Resources */,
+				A0197BC0E4215D609E5328F9 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				05AE98D4809E4441EF2FC050 /* PBXTargetDependency */,
+			);
+			name = crumb;
+			packageProductDependencies = (
+			);
+			productName = crumb;
+			productReference = 37D1685F11BBD93FC9E85F2D /* crumb.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B8C781A99EF072D287E0A194 /* CrumbShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 21A311E4FEC98ACEDD9FCAE8 /* Build configuration list for PBXNativeTarget "CrumbShare" */;
+			buildPhases = (
+				103F29E4B9D237C76D1EEE6D /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CrumbShare;
+			packageProductDependencies = (
+			);
+			productName = CrumbShare;
+			productReference = 64CF8BC822BD827FB10E03D3 /* CrumbShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3C86C3999D71DA49210313DD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					0693FF7C5ADE62C6D99F1704 = {
+						DevelopmentTeam = DW8V3D3NS2;
+					};
+					B8C781A99EF072D287E0A194 = {
+						DevelopmentTeam = DW8V3D3NS2;
+					};
+				};
+			};
+			buildConfigurationList = 324BFB736A91DBB227088C1C /* Build configuration list for PBXProject "crumb" */;
+			developmentRegion = ja;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				ja,
+			);
+			mainGroup = 2241C99C2082135002EB116F;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = D9089B3298336A8994569ACC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0693FF7C5ADE62C6D99F1704 /* crumb */,
+				B8C781A99EF072D287E0A194 /* CrumbShare */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A39A1BD925DF3B5EF7335723 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2F9519C7FFBF6907C2A3757B /* BricolageGrotesque-Bold.ttf in Resources */,
+				2FE1D5DA2A90A4CF0D092446 /* CrumbFace.png in Resources */,
+				C1AE7DEE80E85FB48922B7E1 /* CrumbIcon@2x.png in Resources */,
+				2A90EDC376E76190E10AA8AB /* CrumbIcon@3x.png in Resources */,
+				223EBD5F775A0BA64234114C /* OFL.txt in Resources */,
+				44EAA9A6BA8733662F1FB0AE /* carbonara.jpg in Resources */,
+				D4E395E40BC8EAB6F903FB8C /* curry.jpg in Resources */,
+				1E3D1A9532639DCA2489BBE6 /* pudding.jpg in Resources */,
+				58E4C42C14B37673432D1013 /* standard-plate-01.png in Resources */,
+				2FF3DC0D6D18D8B772FCB244 /* standard-plate-02.png in Resources */,
+				AE762F6E355E0BC7386D3D1C /* standard-plate-03.png in Resources */,
+				7F1B642E5EE64554DE8522F5 /* standard-plate-04.png in Resources */,
+				2DC6E7A565D04BF5978150A5 /* standard-plate-05.png in Resources */,
+				CC86767C57C560BBC89F1B47 /* standard-plate-06.png in Resources */,
+				9EE88062E389718B97E14005 /* standard-plate-07.png in Resources */,
+				F34D47B6B098EF34C03FC8C3 /* standard-plate-08.png in Resources */,
+				04FCF64C224A1B537123B698 /* standard-plate-09.png in Resources */,
+				E31D87EB5322C719B8BAD292 /* standard-plate-10.png in Resources */,
+				3CB9A8F36E52318DDDCF0DA0 /* standard-plate-11.png in Resources */,
+				C9766E69B1EAC7531920C479 /* standard-plate-12.png in Resources */,
+				E78E0507F73985CE5F976166 /* standard-plate-13.png in Resources */,
+				67D5EB6FFFC95F8C30D003FF /* standard-plate-14.png in Resources */,
+				6B349C12351EE44D1158DEFF /* standard-plate-15.png in Resources */,
+				EF4F73740F3F2CE420373949 /* vegetables.jpg in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		103F29E4B9D237C76D1EEE6D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4675FA946FA4F79B13909215 /* InstagramDraft.swift in Sources */,
+				11028ED5384044336EB34E97 /* InstagramPreview.swift in Sources */,
+				25603A0AFFCBB8B60E51CEAB /* ShareViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F1A62D0A1725B8D2C3A51EAA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF8B916E209E5797F8E4FAD5 /* CrumbApp.swift in Sources */,
+				3C15CF2C1980B7B901A7E917 /* HomePlateEditor.swift in Sources */,
+				FCE5ABC48B41E154334FF336 /* InstagramDraft.swift in Sources */,
+				3A798999108BE564E21B2FDC /* InstagramPreview.swift in Sources */,
+				0C94722B91A63F86961D4308 /* MealCalendar.swift in Sources */,
+				271CA8E4E5E87998347E0D65 /* MealDetail.swift in Sources */,
+				4EE3B4A0F2BA524EEA8D037A /* MealEditor.swift in Sources */,
+				5A1B602C55C4682F6A8424DC /* MealFolders.swift in Sources */,
+				618E9D0BEBB9213D903F8A87 /* MealMap.swift in Sources */,
+				E8F6D0734424CA0A79F8FE10 /* MealPhotoCropper.swift in Sources */,
+				25FF5986148061D176DC22E4 /* Meals.swift in Sources */,
+				0300D3E7D455D72AE812F81F /* PhotoPlating.swift in Sources */,
+				D110C8D0BF653595886F83F1 /* PlatePicker.swift in Sources */,
+				6F04E1566330622D56904463 /* Recipe.swift in Sources */,
+				9929FD16D0E1FB70C42CE74E /* SharedMaps.swift in Sources */,
+				E79270248AFF19FA4EB3966A /* WantedPlaceDetail.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		05AE98D4809E4441EF2FC050 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B8C781A99EF072D287E0A194 /* CrumbShare */;
+			targetProxy = 637884221010BAF70629F2DF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		01E5CB88F72C0FA65A96E0BD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		0DA90BA3B55DEFB13C58699F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = CrumbGroups.entitlements;
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.share;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6112D812BB20F6138EBC5BB7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6AAE9FC59E599A84C3E12019 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = CrumbGroups.entitlements;
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.share;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6E1D8AF2A04E6379E9F7BA8F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Crumb.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CrumbInfo.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = crumb;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		756E46D7CF9D0FAA74FA4BE0 /* Device Preview */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = "Device Preview";
+		};
+		8D0E3C4AB689B5CC742CB7DF /* Device Preview */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = CrumbGroups.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CrumbInfo.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "crumb Preview";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.preview;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) CRUMB_DEVICE_PREVIEW";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = "Device Preview";
+		};
+		F4DE1AF4368CF4A9ADFF8C4A /* Device Preview */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = CrumbGroups.entitlements;
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.preview.share;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Device Preview";
+		};
+		F68AE409BFC75D68560C46A4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Crumb.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CrumbInfo.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = crumb;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		21A311E4FEC98ACEDD9FCAE8 /* Build configuration list for PBXNativeTarget "CrumbShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0DA90BA3B55DEFB13C58699F /* Debug */,
+				F4DE1AF4368CF4A9ADFF8C4A /* Device Preview */,
+				6AAE9FC59E599A84C3E12019 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		324BFB736A91DBB227088C1C /* Build configuration list for PBXProject "crumb" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6112D812BB20F6138EBC5BB7 /* Debug */,
+				756E46D7CF9D0FAA74FA4BE0 /* Device Preview */,
+				01E5CB88F72C0FA65A96E0BD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F36CD738730281322C6D18A4 /* Build configuration list for PBXNativeTarget "crumb" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F68AE409BFC75D68560C46A4 /* Debug */,
+				8D0E3C4AB689B5CC742CB7DF /* Device Preview */,
+				6E1D8AF2A04E6379E9F7BA8F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3C86C3999D71DA49210313DD /* Project object */;
+}

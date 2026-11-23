@@ -1,0 +1,19 @@
+
+
+# Local Xcode state and build output
+.DS_Store
+**/xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+.build/
+# Local credentials
+.env
+.env.*
+!.env.example
+*.p12
+*.mobileprovision
+*.p8
+*Secrets*
+*secrets*
+Config/Local.xcconfig

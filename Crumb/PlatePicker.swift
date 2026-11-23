@@ -1,0 +1,254 @@
+import SwiftUI
+import SwiftData
+import PhotosUI
+
+struct PlatePlacement: Equatable {
+    var x = 0.0
+    var y = 0.0
+    var scale = 0.64
+}
+
+struct PlateOption: Identifiable {
+    let id: String
+    let name: String
+    let photo: Data
+    var placement = PlatePlacement()
+
+    static let standard: [Self] = [
+        "紺の太縁", "藍の連続模様", "深緑の二重線", "青の太線", "朱の点模様",
+        "青の三重線", "紫の波縁", "藍の植物模様", "オリーブの縁",
+        "藍の唐草", "若草の波縁", "青の二重線", "赤の波縁", "小さな赤い花", "淡い桃色の花"
+    ].enumerated().compactMap { index, name in
+        let key = String(format: "standard-plate-%02d", index + 1)
+        guard let url = Bundle.main.url(forResource: key, withExtension: "png"),
+              let data = try? Data(contentsOf: url) else { return nil }
+        return Self(id: key, name: name, photo: data)
+    }
+
+    init(id: String, name: String, photo: Data, placement: PlatePlacement = .init()) {
+        self.id = id
+        self.name = name
+        self.photo = photo
+        self.placement = placement
+    }
+
+    @MainActor init(plate: HomePlate, number: Int) {
+        id = plate.identifier?.uuidString ?? "legacy-\(plate.persistentModelID)"
+        name = "マイお皿 \(number)"
+        if plate.photo.isPlatedPhoto {
+            photo = plate.photo
+        } else {
+            photo = (try? PlatingImage.crop(plate.photo, shape: "丸", rim: .clear)) ?? plate.photo
+        }
+        placement = PlatePlacement(x: plate.foodX ?? 0, y: plate.foodY ?? 0, scale: plate.foodScale ?? 0.64)
+    }
+}
+
+struct PlatePicker: View {
+    let original: Data
+    let currentPhoto: Data?
+    let initialPlateID: String?
+    let foodSubject: () async throws -> Data
+    let onApply: (PlateOption?, Data) -> Void
+    @Environment(\.dismiss) private var dismiss
+    @Query(sort: \HomePlate.addedAt, order: .reverse) private var homePlates: [HomePlate]
+    @State private var selectedID: String?
+    @State private var subject: Data?
+    @State private var working = false
+    @State private var failed = false
+    @State private var addingPlate = false
+    @State private var attempt = 0
+    @State private var compositionError = false
+
+    init(original: Data, currentPhoto: Data?, initialPlateID: String?,
+         foodSubject: @escaping () async throws -> Data, onApply: @escaping (PlateOption?, Data) -> Void) {
+        self.original = original
+        self.currentPhoto = currentPhoto
+        self.initialPlateID = initialPlateID
+        self.foodSubject = foodSubject
+        self.onApply = onApply
+        _selectedID = State(initialValue: initialPlateID)
+    }
+
+    private var custom: [PlateOption] {
+        homePlates.enumerated().map { PlateOption(plate: $0.element, number: homePlates.count - $0.offset) }
+    }
+
+    private var selectedPlate: PlateOption? {
+        (custom + PlateOption.standard).first { $0.id == selectedID }
+    }
+
+    private var columns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 10), count: 4)
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Group {
+                        if let selectedPlate, let subject {
+                            PlatedFoodPreview(subject: subject, plate: selectedPlate)
+                        } else {
+                            MealPhoto(data: selectedID != nil && selectedID == initialPlateID ? currentPhoto ?? original : original,
+                                      size: 680, contentMode: .fit)
+                        }
+                    }
+                    .frame(width: 156, height: 156)
+                    .frame(maxWidth: .infinity)
+                    if working { ProgressView("料理を切り抜いています") }
+                    if failed {
+                        Text("料理を切り抜けませんでした。元の写真に戻すこともできます。")
+                            .font(.footnote)
+                        HStack {
+                            Button("もう一度試す") { attempt += 1 }
+                            Button("写真をそのまま盛る") {
+                                subject = try? PlatingImage.crop(original, shape: "角丸", rim: .clear)
+                                failed = subject == nil
+                            }
+                        }
+                    }
+                    Button {
+                        selectedID = nil
+                    } label: {
+                        Label("なし", systemImage: selectedID == nil ? "checkmark.circle.fill" : "photo")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(12).background(.white, in: .rect(cornerRadius: 10))
+                    }
+                    .buttonStyle(.plain)
+                    Text("マイお皿").font(.headline)
+                    LazyVGrid(columns: columns, spacing: 10) {
+                        Button { addingPlate = true } label: {
+                            VStack(spacing: 6) {
+                                Image(systemName: "plus")
+                                Text("お皿を追加").font(.caption2)
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .aspectRatio(1, contentMode: .fit)
+                            .background(.white, in: .rect(cornerRadius: 12))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(subject == nil)
+                        ForEach(custom) { plateTile($0) }
+                    }
+                    Text("標準のお皿").font(.headline)
+                    LazyVGrid(columns: columns, spacing: 10) {
+                        ForEach(PlateOption.standard) { plateTile($0) }
+                    }
+                }
+                .padding(18)
+            }
+            .background(paper.ignoresSafeArea())
+            .navigationTitle("お皿を変える")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("閉じる") { dismiss() } }
+            }
+            .safeAreaInset(edge: .bottom) {
+                Button(selectedID == nil ? "お皿なしにする" : "このお皿にする") {
+                    if selectedID == nil {
+                        onApply(nil, original)
+                    } else if let selectedPlate, let subject {
+                        do {
+                            let result = try PlateRendering.compose(food: subject, on: selectedPlate)
+                            onApply(selectedPlate, result)
+                        } catch {
+                            compositionError = true
+                        }
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(selectedID != nil && (subject == nil || selectedPlate == nil))
+                .frame(maxWidth: .infinity)
+                .padding(12)
+                .background(paper)
+            }
+            .navigationDestination(isPresented: $addingPlate) {
+                if let subject {
+                    HomePlateEditor(food: subject, onCancel: { dismiss() }) { plate, photo in
+                        onApply(plate, photo)
+                    }
+                }
+            }
+            .alert("盛り付けを反映できませんでした", isPresented: $compositionError) {
+                Button("閉じる", role: .cancel) {}
+            }
+            .task(id: attempt) {
+                working = true
+                failed = false
+                defer { working = false }
+                do { subject = try await foodSubject() }
+                catch { if !Task.isCancelled { failed = true } }
+            }
+        }
+    }
+
+    private func plateTile(_ plate: PlateOption) -> some View {
+        Button { selectedID = plate.id } label: {
+            MealPhoto(data: plate.photo, size: 160, contentMode: .fit)
+                .aspectRatio(1, contentMode: .fit)
+                .padding(4)
+                .background(.white, in: .rect(cornerRadius: 12))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(selectedID == plate.id ? ink : ink.opacity(0.08), lineWidth: selectedID == plate.id ? 2 : 1)
+                }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(plate.name)
+        .accessibilityAddTraits(selectedID == plate.id ? .isSelected : [])
+    }
+}
+
+struct PlatedFoodPreview: View {
+    let subject: Data
+    let plate: PlateOption
+
+    var body: some View {
+        GeometryReader { proxy in
+            let side = proxy.size.width
+            if let food = UIImage(data: subject) {
+                ZStack {
+                    MealPhoto(data: plate.photo, size: 620, contentMode: .fit)
+                    Image(uiImage: food).resizable().scaledToFit()
+                        .frame(width: side * plate.placement.scale, height: side * plate.placement.scale)
+                        .offset(x: side * plate.placement.x, y: side * plate.placement.y)
+                }
+            }
+        }
+        .aspectRatio(1, contentMode: .fit)
+    }
+}
+
+enum PlateRendering {
+    @MainActor static func compose(food: Data, on plate: PlateOption) throws -> Data {
+        guard let food = UIImage(data: food), let backdrop = UIImage(data: plate.photo) else {
+            throw CocoaError(.fileReadCorruptFile)
+        }
+        let side: CGFloat = 900
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        return UIGraphicsImageRenderer(size: CGSize(width: side, height: side), format: format).pngData { _ in
+            backdrop.draw(in: fitted(backdrop.size, inside: side, center: CGPoint(x: side / 2, y: side / 2)))
+            let placement = plate.placement
+            food.draw(in: fitted(food.size, inside: side * placement.scale,
+                                 center: CGPoint(x: side * (0.5 + placement.x), y: side * (0.5 + placement.y))))
+        }
+    }
+
+    @MainActor static func normalize(_ image: UIImage) -> Data {
+        let side: CGFloat = 576
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        return UIGraphicsImageRenderer(size: CGSize(width: side, height: side), format: format).pngData { _ in
+            image.draw(in: fitted(image.size, inside: 515, center: CGPoint(x: side / 2, y: side / 2)))
+        }
+    }
+
+    private static func fitted(_ size: CGSize, inside side: CGFloat, center: CGPoint) -> CGRect {
+        let scale = side / max(size.width, size.height)
+        let width = size.width * scale
+        let height = size.height * scale
+        return CGRect(x: center.x - width / 2, y: center.y - height / 2, width: width, height: height)
+    }
+}

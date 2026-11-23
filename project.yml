@@ -1,0 +1,94 @@
+name: crumb
+options:
+  developmentLanguage: ja
+configs:
+  Debug: debug
+  Release: release
+  Device Preview: debug
+schemes:
+  crumb (iCloud):
+    build:
+      targets:
+        crumb: all
+    run:
+      config: Debug
+  crumb Device Preview:
+    build:
+      targets:
+        crumb: all
+    run:
+      config: Device Preview
+    test:
+      config: Device Preview
+    profile:
+      config: Device Preview
+    analyze:
+      config: Device Preview
+    archive:
+      config: Device Preview
+targets:
+  crumb:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources: [Crumb, ShareInbox]
+    dependencies:
+      - target: CrumbShare
+        embed: true
+    info:
+      path: CrumbInfo.plist
+      properties:
+        CFBundleIcons:
+          CFBundlePrimaryIcon:
+            CFBundleIconFiles: [CrumbIcon]
+        CKSharingSupported: true
+        NSCameraUsageDescription: 自宅のお皿を撮影して、料理写真の盛り付けに使います。
+        UIAppFonts: [BricolageGrotesque-Bold.ttf]
+    settings:
+      base:
+        CODE_SIGN_ENTITLEMENTS: Crumb.entitlements
+        DEVELOPMENT_TEAM: DW8V3D3NS2
+        PRODUCT_BUNDLE_IDENTIFIER: app.tabinote.meals
+        INFOPLIST_KEY_CFBundleDisplayName: crumb
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
+      configs:
+        Device Preview:
+          CODE_SIGN_ENTITLEMENTS: CrumbGroups.entitlements
+          CODE_SIGN_STYLE: Automatic
+          PRODUCT_BUNDLE_IDENTIFIER: app.tabinote.meals.preview
+          INFOPLIST_KEY_CFBundleDisplayName: crumb Preview
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) CRUMB_DEVICE_PREVIEW"
+
+  CrumbShare:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: ShareExtension
+        excludes: [Info.plist]
+      - ShareInbox
+    info:
+      path: ShareExtension/Info.plist
+      properties:
+        CFBundleDisplayName: crumb
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsWebURLWithMaxCount: 1
+              NSExtensionActivationSupportsText: true
+    settings:
+      base:
+        CODE_SIGN_ENTITLEMENTS: CrumbGroups.entitlements
+        DEVELOPMENT_TEAM: DW8V3D3NS2
+        PRODUCT_BUNDLE_IDENTIFIER: app.tabinote.meals.share
+        APPLICATION_EXTENSION_API_ONLY: YES
+        SWIFT_VERSION: "5.0"
+      configs:
+        Device Preview:
+          PRODUCT_BUNDLE_IDENTIFIER: app.tabinote.meals.preview.share
