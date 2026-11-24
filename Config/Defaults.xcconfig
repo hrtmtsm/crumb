@@ -1,0 +1,4 @@
+// Public client configuration. The optional local override is ignored by git.
+SUPABASE_URL = https:/$()/ennerbywpvdcmpqaohmf.supabase.co
+SUPABASE_PUBLISHABLE_KEY =
+#include? "Local.xcconfig"

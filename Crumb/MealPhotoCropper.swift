@@ -12,10 +12,19 @@ struct MealPhotoCropper: View {
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
-                let side = max(1, min(geometry.size.width - 32, geometry.size.height - 90))
+                let side = max(1, min(geometry.size.width - 32, geometry.size.height - 170))
                 VStack(spacing: 18) {
                     Spacer(minLength: 0)
                     cropFrame(side)
+                    HStack {
+                        Image(systemName: "minus.magnifyingglass")
+                        Slider(value: $zoom, in: 1...5)
+                            .onChange(of: zoom) { _, _ in
+                                offset = constrainedOffset(offset, size: fittedSize(side: side, scale: zoom), side: side)
+                            }.accessibilityLabel("拡大率")
+                        Image(systemName: "plus.magnifyingglass")
+                        Text(String(format: "%.1f×", zoom)).font(.caption.monospacedDigit()).frame(width: 38)
+                    }.padding(.horizontal, 22)
                     Text("ピンチで拡大し、ドラッグで位置を調整")
                         .font(.footnote)
                         .multilineTextAlignment(.center)

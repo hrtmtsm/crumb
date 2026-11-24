@@ -9,6 +9,7 @@ final class Meal {
     @Attribute(.externalStorage) var photo: Data
     @Attribute(.externalStorage) var originalPhoto: Data?
     var selectedPlateID: String?
+    var photoFraming: String?
     var name: String
     var date: Date
     var dateOmitted: Bool?
@@ -32,6 +33,8 @@ final class Meal {
     var note = ""
     var recipe = ""
     var structuredRecipe: String?
+    var categoryData: String?
+    var menuBookID: String?
     var recipeURL = ""
     var recipeUpdatedAt: Date?
     var placeName: String?
@@ -48,7 +51,19 @@ final class Meal {
         setPlace(place)
     }
 
-    var title: String { name.isEmpty ? "名前のない料理" : name }
+    var categories: [String] {
+        get {
+            guard let categoryData, let data = categoryData.data(using: .utf8),
+                  let names = try? JSONDecoder().decode([String].self, from: data) else { return [] }
+            return Array(RecipeCategories.normalized(names).prefix(1))
+        }
+        set {
+            let names = Array(RecipeCategories.normalized(newValue).prefix(1))
+            categoryData = names.isEmpty ? nil : (try? JSONEncoder().encode(names)).map { String(decoding: $0, as: UTF8.self) }
+        }
+    }
+
+    var title: String { name.isEmpty ? AppLanguage.text("名前のない料理") : name }
     var place: Place? {
         guard let placeName, let placeKey else { return nil }
         if placeKey == Place.home.id { return .home }
@@ -100,13 +115,16 @@ struct Place: Identifiable {
     }
 }
 
-let paper = Color(red: 255/255, green: 254/255, blue: 250/255)
-let ink = Color(red: 25/255, green: 24/255, blue: 22/255)
+let paper = Color.white
+let ink = Color(red: 38/255, green: 34/255, blue: 31/255)
+let secondaryInk = Color(red: 110/255, green: 101/255, blue: 93/255)
+let placeholderInk = Color(red: 116/255, green: 108/255, blue: 100/255)
+let fieldBorder = Color(red: 228/255, green: 223/255, blue: 218/255)
 let clay = ink
 let tomato = Color(red: 235/255, green: 96/255, blue: 74/255)
 
 func dayLabel(_ date: Date) -> String {
-    date.formatted(.dateTime.year().month(.defaultDigits).day().locale(Locale(identifier: "ja_JP")))
+    date.formatted(.dateTime.month(.abbreviated).day().year().locale(AppLanguage.locale))
 }
 
 extension Data {
@@ -170,4 +188,42 @@ enum Samples {
 
 func crumbFont(_ size: CGFloat) -> Font {
     .custom("BricolageGrotesque-48ptBold", size: size, relativeTo: .largeTitle)
+}
+
+enum RecipeCategories {
+    static func decode(_ value: String) -> [String] {
+        guard let data = value.data(using: .utf8), let names = try? JSONDecoder().decode([String].self, from: data) else { return [] }
+        return normalized(names)
+    }
+    static func encode(_ names: [String]) -> String {
+        guard let data = try? JSONEncoder().encode(normalized(names)) else { return "[]" }
+        return String(decoding: data, as: UTF8.self)
+    }
+    static func normalized(_ names: [String]) -> [String] {
+        var keys = Set<String>()
+        return names.compactMap { name in
+            let clean = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !clean.isEmpty, keys.insert(clean.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "en_US_POSIX"))).inserted else { return nil }
+            return clean
+        }
+    }
+    static func matches(_ lhs: String, _ rhs: String) -> Bool {
+        lhs.compare(rhs, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame
+    }
+}
+
+struct MenuBook: Codable, Identifiable, Equatable {
+    var id: String
+    var name: String
+    static let defaultID = "default"
+    static let defaultBook = MenuBook(id: defaultID, name: "My Menu")
+    static func decode(_ value: String) -> [MenuBook] {
+        let saved = value.data(using: .utf8).flatMap { try? JSONDecoder().decode([MenuBook].self, from: $0) } ?? []
+        var ids: Set<String> = [defaultID]
+        return [defaultBook] + saved.filter { !$0.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && ids.insert($0.id).inserted }
+    }
+    static func encode(_ books: [MenuBook]) -> String {
+        guard let data = try? JSONEncoder().encode(books.filter { $0.id != defaultID }) else { return "[]" }
+        return String(decoding: data, as: UTF8.self)
+    }
 }

@@ -145,7 +145,7 @@ struct PlatePicker: View {
                 ToolbarItem(placement: .cancellationAction) { Button("閉じる") { dismiss() } }
             }
             .safeAreaInset(edge: .bottom) {
-                Button(selectedID == nil ? "お皿なしにする" : "このお皿にする") {
+                Button(LocalizedStringKey(selectedID == nil ? "お皿なしにする" : "このお皿にする")) {
                     if selectedID == nil {
                         onApply(nil, original)
                     } else if let selectedPlate, let subject {

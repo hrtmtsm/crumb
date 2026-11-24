@@ -41,12 +41,12 @@ struct HomePlateEditor: View {
                 } else {
                     photoControls
                 }
-                if let error { Text(error).font(.footnote).foregroundStyle(.secondary) }
+                if let error { Text(AppLanguage.text(error)).font(.footnote).foregroundStyle(.secondary) }
             }
             .padding(20)
         }
         .background(paper.ignoresSafeArea())
-        .navigationTitle(reviewingPlacement ? "盛り付け位置" : "お皿を追加")
+        .navigationTitle(LocalizedStringKey(reviewingPlacement ? "盛り付け位置" : "お皿を追加"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -102,7 +102,7 @@ struct HomePlateEditor: View {
                 }
                 .frame(height: 245)
                 Picker("切り抜き範囲", selection: $silhouette) {
-                    ForEach(Silhouette.allCases) { Text($0.rawValue).tag($0) }
+                    ForEach(Silhouette.allCases) { Text(LocalizedStringKey($0.rawValue)).tag($0) }
                 }
                 .pickerStyle(.segmented)
                 Button("写真の範囲を調整", systemImage: "crop") { adjustingCrop = true }

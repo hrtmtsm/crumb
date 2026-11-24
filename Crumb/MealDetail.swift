@@ -23,29 +23,23 @@ struct MealDetail: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                if meal.wantToVisit == true {
-                    Label("行きたい", systemImage: "bookmark.fill")
-                        .font(.subheadline.weight(.semibold)).foregroundStyle(clay)
-                    if let source = meal.sourceURL, let url = URL(string: source) {
-                        Link(destination: url) {
-                            Label("Instagramの投稿を見る", systemImage: "arrow.up.right.square")
-                        }
-                    }
-                } else {
                 MealPhoto(data: meal.photo, size: 1250)
                     .aspectRatio(1, contentMode: .fit).clipShape(.rect(cornerRadius: 24))
-                }
                 VStack(alignment: .leading, spacing: 9) {
                     Text(meal.title).font(.system(.largeTitle)).bold()
                         .accessibilityAddTraits(.isHeader)
                     if let date = meal.recordedDate {
                         Text(dayLabel(date)).foregroundStyle(clay)
                     }
-                    if let place = meal.place {
-                        Label(place.name, systemImage: place.coordinate == nil ? "house" : "mappin")
-                            .font(.system(.subheadline))
-                    }
                     if !meal.note.isEmpty { Text(meal.note).padding(.top, 5) }
+                    IngredientTagLayout(spacing: 7) {
+                        ForEach(meal.categories, id: \.self) { category in
+                            Text(verbatim: category).font(.caption)
+                                .padding(.horizontal, 10).padding(.vertical, 6)
+                                .background(ink.opacity(0.06), in: .capsule)
+                        }
+                    }
+
                 }
                 if hasRecipe {
                     Divider()
@@ -55,26 +49,24 @@ struct MealDetail: View {
                     }
                     .buttonStyle(.bordered)
                 }
-                if meal.wantToVisit != true {
                 Menu {
-                    Button("食べた思い出") { share(recipe: false) }
-                    if meal.place?.isVenue == true {
-                        Button("食べた思い出（店名あり）") { share(recipe: false, includePlace: true) }
+                    Button("料理写真を共有", systemImage: "photo") { share(recipe: false) }
+                    if hasRecipe {
+                        Button("レシピを共有", systemImage: "book") { share(recipe: true) }
                     }
-                    if hasRecipe { Button("レシピ") { share(recipe: true) } }
                 } label: {
-                    Label("カードを共有", systemImage: "square.and.arrow.up")
-                        .frame(maxWidth: .infinity, minHeight: 36)
+                    Label("共有", systemImage: "square.and.arrow.up")
+                        .labelStyle(.titleAndIcon)
                         .foregroundStyle(.white)
-                }
-                .buttonStyle(.borderedProminent)
-                }
+                        .frame(maxWidth: .infinity, minHeight: 36)
+                }.buttonStyle(.borderedProminent).tint(ink)
+
             }
             .padding(24)
         }
         .foregroundStyle(ink)
         .background(paper.ignoresSafeArea())
-        .navigationTitle("食事の記録")
+        .navigationTitle("レシピ")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.visible, for: .navigationBar)
         .toolbar {
@@ -109,26 +101,12 @@ struct MealDetail: View {
             }
         }) {
             NavigationStack {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
-                        Text(meal.title).font(.title.bold())
-                        if !structured.ingredients.isEmpty {
-                            Stepper("\(servings)人前", value: Binding(
-                                get: { servings }, set: { servingOverride = $0 }
-                            ), in: 1...99)
-                        }
-                        RecipeContent(recipe: structured, servings: servings)
-                        if !meal.recipe.isEmpty { Text(meal.recipe).textSelection(.enabled) }
-                        if let link { Link("レシピのページを開く", destination: link) }
-                        Button("レシピカードを作る", systemImage: "square.and.arrow.up") {
-                            shareAfterRecipe = true
-                            viewingRecipe = false
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
-                    .padding(24)
+                RecipeReader(meal: meal, recipe: structured, servings: Binding(
+                    get: { servings }, set: { servingOverride = $0 }
+                ), link: link) {
+                    shareAfterRecipe = true
+                    viewingRecipe = false
                 }
-                .background(paper.ignoresSafeArea())
                 .navigationTitle("レシピ")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -166,7 +144,7 @@ struct MealDetail: View {
                     if !structured.ingredients.isEmpty {
                         Text("\(servings)人前").font(.subheadline)
                     }
-                    RecipeContent(recipe: structured, servings: servings)
+                    RecipeContent(recipe: structured, servings: servings, showsIngredientTags: false)
                     if !meal.recipe.isEmpty {
                         Text(meal.recipe).font(.system(size: 17)).fixedSize(horizontal: false, vertical: true)
                     }
@@ -238,5 +216,95 @@ struct SharePreview: View {
 
     private var SharePreviewItem: SwiftUI.SharePreview<Image, Never> {
         SwiftUI.SharePreview(card.description, image: Image(uiImage: card.image))
+    }
+}
+
+private struct RecipeReader: View {
+    let meal: Meal
+    let recipe: MealRecipe
+    @Binding var servings: Int
+    let link: URL?
+    let share: () -> Void
+    @State private var section = 0
+
+    var body: some View {
+        VStack(spacing: 16) {
+            HStack(spacing: 14) {
+                MealPhoto(data: meal.photo, size: 200)
+                    .aspectRatio(1, contentMode: .fit)
+                    .frame(width: 64, height: 64)
+                    .clipShape(.rect(cornerRadius: 14))
+                    .accessibilityHidden(true)
+                Text(meal.title).font(.title2.bold())
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityAddTraits(.isHeader)
+            }.padding(.horizontal, 20)
+            if !recipe.ingredients.isEmpty {
+                Stepper("\(servings)人前", value: $servings, in: 1...99)
+                    .padding(.horizontal, 20)
+            }
+            Picker("レシピの表示", selection: $section) {
+                Text("材料").tag(0)
+                Text("手順").tag(1)
+            }.pickerStyle(.segmented).padding(.horizontal, 20)
+
+            // Keep both scroll views mounted so changing tabs preserves each position.
+            ZStack {
+                readerPage(ingredients: true)
+                    .opacity(section == 0 ? 1 : 0)
+                    .allowsHitTesting(section == 0)
+                    .accessibilityHidden(section != 0)
+                readerPage(ingredients: false)
+                    .opacity(section == 1 ? 1 : 0)
+                    .allowsHitTesting(section == 1)
+                    .accessibilityHidden(section != 1)
+            }
+        }
+        .padding(.top, 12)
+        .foregroundStyle(ink)
+        .background(paper.ignoresSafeArea())
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button("レシピを共有", systemImage: "square.and.arrow.up", action: share)
+            }
+        }
+    }
+
+    private var displayedRecipe: MealRecipe {
+        var value = recipe
+        value.changeServings(to: servings)
+        return value
+    }
+
+    private func readerPage(ingredients: Bool) -> some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                if ingredients {
+                    if !recipe.ingredients.isEmpty {
+                        ForEach(recipe.ingredients) { ingredient in
+                            HStack(alignment: .firstTextBaseline, spacing: 16) {
+                                Text(ingredient.name).frame(maxWidth: .infinity, alignment: .leading)
+                                Text(ingredient.quantity(multiplier: Double(servings) / Double(recipe.servings)))
+                                    .foregroundStyle(.secondary).multilineTextAlignment(.trailing)
+                            }
+                            .padding(16).frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.white, in: .rect(cornerRadius: 16))
+                        }
+                    } else {
+                        Text("材料はまだ登録されていません").foregroundStyle(.secondary)
+                    }
+                } else {
+                    RecipeContent(recipe: displayedRecipe, servings: servings, showsIngredients: false, showsIngredientTags: false)
+                    if !meal.recipe.isEmpty { Text(meal.recipe).textSelection(.enabled) }
+                    if recipe.steps.isEmpty && meal.recipe.isEmpty {
+                        Text("手順はまだ登録されていません").foregroundStyle(.secondary)
+                    }
+                }
+                if let link { Link("レシピのページを開く", destination: link) }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20).padding(.bottom, 24).padding(.top, 4)
+        }
+        .scrollBounceBehavior(.basedOnSize)
     }
 }

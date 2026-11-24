@@ -22,10 +22,21 @@ struct PhotoPlating: View {
     @Binding var photo: Data?
     @Binding var working: Bool
     @Binding var plateID: String?
+    @Binding var framing: String?
+    init(original: Data, photo: Binding<Data?>, working: Binding<Bool>, plateID: Binding<String?>, framing: Binding<String?>) {
+        self.original = original; self._photo = photo; self._working = working
+        self._plateID = plateID; self._framing = framing
+        let saved = PhotoFrame.decode(framing.wrappedValue)
+        let restored = Mode(rawValue: saved?.shape ?? "") ?? .original
+        _mode = State(initialValue: restored == .plate ? .original : restored)
+        _removeBackground = State(initialValue: restored == .outline)
+        _rim = State(initialValue: Rim(rawValue: saved?.rim ?? "") ?? .none)
+    }
     @State private var applyingPlate = false
     @State private var showingPlatePicker = false
     @State private var mode: Mode = .original
-    @State private var rim: Rim = .white
+    @State private var rim: Rim = .none
+    @State private var removeBackground = false
     @State private var cutout: Data?
     @Query(sort: \HomePlate.addedAt, order: .reverse) private var homePlates: [HomePlate]
 
@@ -46,11 +57,13 @@ struct PhotoPlating: View {
     }
 
     private enum Rim: String, CaseIterable, Identifiable {
+        case none = "なし"
         case white = "白", black = "黒", cream = "クリーム", pink = "ピンク", blue = "水色", green = "ミント"
 
         var id: Self { self }
         var color: UIColor {
             switch self {
+            case .none: .clear
             case .white: .white
             case .black: UIColor(ink)
             case .cream: UIColor(red: 1, green: 0.91, blue: 0.72, alpha: 1)
@@ -65,7 +78,8 @@ struct PhotoPlating: View {
         let mode: Mode
         let rim: Rim
         let plateID: String?
-
+        let removeBackground: Bool
+        let framing: String?
     }
 
     private var selectedPlate: PlateOption? {
@@ -96,9 +110,9 @@ struct PhotoPlating: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            if mode != .original && mode != .plate {
+            Group {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("縁の色").font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
+                    Text("縁").font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
                     ScrollView(.horizontal) {
                         HStack(spacing: 8) {
                             ForEach(Rim.allCases) { option in
@@ -108,11 +122,12 @@ struct PhotoPlating: View {
                                     Circle().fill(Color(uiColor: option.color))
                                         .frame(width: 30, height: 30)
                                         .overlay { Circle().strokeBorder(ink.opacity(0.18)) }
+                                        .overlay { if option == .none { Image(systemName: "nosign").font(.caption).foregroundStyle(.secondary) } }
                                         .padding(5)
                                         .overlay { Circle().strokeBorder(rim == option ? ink : .clear, lineWidth: 2) }
                                 }
                                 .buttonStyle(.plain)
-                                .accessibilityLabel(option.rawValue)
+                                .accessibilityLabel(Text(LocalizedStringKey(option.rawValue)))
                                 .accessibilityAddTraits(rim == option ? .isSelected : [])
                             }
                         }
@@ -140,21 +155,20 @@ struct PhotoPlating: View {
                 .scrollIndicators(.hidden)
             }
             if let error {
-                Text(error).font(.footnote).foregroundStyle(.secondary)
+                Text(AppLanguage.text(error)).font(.footnote).foregroundStyle(.secondary)
             }
         }
         .disabled(working || applyingPlate)
         .sheet(isPresented: $showingPlatePicker) {
             PlatePicker(original: original, currentPhoto: photo, initialPlateID: plateID,
-                        foodSubject: { try await loadSubject() }) { plate, result in
+                        foodSubject: { try await shapedImage() }) { plate, result in
                 plateID = plate?.id
-                mode = plate == nil ? .original : .plate
                 photo = result
                 error = nil
                 showingPlatePicker = false
             }
         }
-        .task(id: PreviewChoice(mode: mode, rim: rim, plateID: plateID)) { await renderPreview() }
+        .task(id: PreviewChoice(mode: mode, rim: rim, plateID: plateID, removeBackground: removeBackground, framing: framing)) { await renderPreview() }
     }
 
     private var quickPlates: [PlateOption] {
@@ -171,28 +185,8 @@ struct PhotoPlating: View {
         let selected = plateID == plate?.id
         return Button {
             guard !selected else { return }
-            if let plate {
-                applyingPlate = true
-                working = true
-                Task {
-                    defer { applyingPlate = false; working = false }
-                    do {
-                        let subject = try await loadSubject()
-                        let result = try PlateRendering.compose(food: subject, on: plate)
-                        plateID = plate.id
-                        mode = .plate
-                        photo = result
-                        error = nil
-                    } catch {
-                        self.error = "お皿に盛り付けられませんでした。"
-                    }
-                }
-            } else {
-                plateID = nil
-                mode = .original
-                photo = original
-                error = nil
-            }
+            plateID = plate?.id
+            error = nil
         } label: {
             VStack(spacing: 5) {
                 Group {
@@ -209,22 +203,22 @@ struct PhotoPlating: View {
                     RoundedRectangle(cornerRadius: 12)
                         .strokeBorder(ink.opacity(selected ? 1 : 0.13))
                 }
-                Text(plate?.name ?? "なし").font(.caption2).lineLimit(1)
             }
             .frame(width: 58)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(plate?.name ?? "なし")
+        .accessibilityLabel(plate?.name ?? "お皿なし")
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
     private func shapeButton(_ shape: Mode, icon: String) -> some View {
         Button {
-            guard mode != shape || shape == .original || plateID != nil else { return }
-            plateID = nil
+            guard mode != shape else { return }
             mode = shape
+            removeBackground = shape == .outline
+            if shape == .original { framing = nil }
             working = shape != .original
-            if shape == .original { photo = original }
         } label: {
             VStack(spacing: 5) {
                 Group {
@@ -240,10 +234,10 @@ struct PhotoPlating: View {
                     .background(ink.opacity(0.025), in: .rect(cornerRadius: 12))
                     .overlay {
                         RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(mode == shape && plateID == nil && (shape != .original || photo == original)
+                            .strokeBorder(mode == shape
                                           ? ink : ink.opacity(0.13))
                     }
-                Text(shape.rawValue).font(.caption2)
+                Text(LocalizedStringKey(shape.rawValue)).font(.caption2)
             }
         }
         .buttonStyle(.plain)
@@ -251,26 +245,36 @@ struct PhotoPlating: View {
     }
 
     @MainActor private func renderPreview() async {
-        working = false
-        guard mode != .original, mode != .plate else { return }
-        error = nil
-        working = true
+        error = nil; working = true
+        defer { working = false }
         do {
-            if mode != .outline && mode != .plate {
-                photo = try PlatingImage.crop(original, shape: mode.rawValue, rim: rim.color)
-                working = false
-                return
-            }
-            let subject = try await loadSubject()
+            let image = try await shapedImage()
             try Task.checkCancellation()
-            photo = try PlatingImage.compose(subject, rim: rim.color)
-            working = false
+            if let selectedPlate {
+                photo = try PlateRendering.compose(food: image, on: selectedPlate)
+            } else { photo = image }
         } catch {
             guard !Task.isCancelled else { return }
-            working = false
-            photo = original
-            self.error = "料理を切り抜けませんでした。「そのまま」で続けるか、別の写真をお試しください。"
+            self.error = "写真を加工できませんでした。別の写真か「そのまま」でお試しください。"
         }
+    }
+
+    @MainActor private func shapedImage() async throws -> Data {
+        var frame = PhotoFrame.decode(framing) ?? PhotoFrame(shape: mode.rawValue, rim: rim.rawValue)
+        frame.shape = mode.rawValue; frame.rim = rim.rawValue
+        frame.backgroundRemoved = mode == .outline
+        let image: Data
+        if mode == .outline {
+            let subject = try await loadSubject()
+            try Task.checkCancellation()
+            image = try PlatingImage.compose(subject, rim: rim.color)
+        } else if mode == .original || mode == .plate {
+            image = rim == .none ? original : try PlatingImage.compose(original, rim: rim.color)
+        } else {
+            image = try PlatingImage.crop(original, shape: mode.rawValue, rim: rim.color, frame: frame)
+        }
+        if framing != frame.encoded { framing = frame.encoded }
+        return image
     }
 
     @MainActor private func loadSubject() async throws -> Data {
@@ -478,26 +482,30 @@ enum PlatingImage {
         }
     }
 
-    @MainActor static func crop(_ data: Data, shape: String, rim: UIColor) throws -> Data {
+    @MainActor static func crop(_ data: Data, shape: String, rim: UIColor, frame: PhotoFrame? = nil) throws -> Data {
         guard let image = thumbnail(data, size: 1100) else { throw CocoaError(.fileReadCorruptFile) }
         let source = UIImage(cgImage: image)
         let canvas = CGRect(x: 0, y: 0, width: 900, height: 900)
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
-        return UIGraphicsImageRenderer(size: canvas.size, format: format).pngData { drawing in
+        let sticker = UIGraphicsImageRenderer(size: canvas.size, format: format).image { drawing in
             let path = shapePath(shape, in: canvas.insetBy(dx: 45, dy: 45))
             drawing.cgContext.saveGState()
             path.addClip()
-            let scale = 900 / min(source.size.width, source.size.height)
+            let scale = 900 * CGFloat(min(5, max(1, frame?.zoom ?? 1))) / min(source.size.width, source.size.height)
             let width = source.size.width * scale
             let height = source.size.height * scale
-            source.draw(in: CGRect(x: (900 - width) / 2, y: (900 - height) / 2,
+            let x = min((width - 900) / 2, max(-(width - 900) / 2, CGFloat(frame?.x ?? 0) * 900))
+            let y = min((height - 900) / 2, max(-(height - 900) / 2, CGFloat(frame?.y ?? 0) * 900))
+            source.draw(in: CGRect(x: (900 - width) / 2 + x, y: (900 - height) / 2 + y,
                                    width: width, height: height))
             drawing.cgContext.restoreGState()
             rim.setStroke()
-            path.lineWidth = 18
+            path.lineWidth = 24
+            path.lineJoinStyle = .round
             path.stroke()
         }
+        return stickerPNG(sticker, canvas: canvas.size, shadow: rim.cgColor.alpha > 0)
     }
 
     @MainActor static func compose(_ data: Data, rim: UIColor) throws -> Data {
@@ -510,13 +518,28 @@ enum PlatingImage {
         let width = subject.size.width * scale
         let height = subject.size.height * scale
         let foodBounds = CGRect(x: canvas.midX - width / 2, y: canvas.midY - height / 2, width: width, height: height)
-        return renderer.pngData { _ in
+        let sticker = renderer.image { _ in
             let silhouette = subject.withTintColor(rim, renderingMode: .alwaysOriginal)
-            for index in 0..<32 {
-                let angle = Double(index) * 2 * .pi / 32
-                silhouette.draw(in: foodBounds.offsetBy(dx: cos(angle) * 20, dy: sin(angle) * 20))
+            // Dense, overlapping silhouettes create a smooth sticker border.
+            for index in 0..<64 {
+                let angle = Double(index) * 2 * .pi / 64
+                silhouette.draw(in: foodBounds.offsetBy(dx: cos(angle) * 22, dy: sin(angle) * 22))
             }
             subject.draw(in: foodBounds)
+        }
+        return stickerPNG(sticker, canvas: canvas.size, shadow: rim.cgColor.alpha > 0)
+    }
+
+    @MainActor private static func stickerPNG(_ image: UIImage, canvas: CGSize, shadow: Bool) -> Data {
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = false
+        return UIGraphicsImageRenderer(size: canvas, format: format).pngData { drawing in
+            if shadow {
+                drawing.cgContext.setShadow(offset: CGSize(width: 0, height: 2), blur: 4,
+                                            color: UIColor.black.withAlphaComponent(0.06).cgColor)
+            }
+            image.draw(in: CGRect(origin: .zero, size: canvas))
         }
     }
 }

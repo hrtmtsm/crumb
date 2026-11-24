@@ -2,7 +2,6 @@ import SwiftUI
 import PhotosUI
 import Photos
 import SwiftData
-@preconcurrency import MapKit
 import ImageIO
 
 struct MealEditor: View {
@@ -18,34 +17,45 @@ struct MealEditor: View {
     @State private var showingCrop = false
     @State private var styling = false
     @State private var selectedPlateID: String?
+    @State private var photoFraming: String?
     @State private var date: Date
     @State private var includesDate: Bool
     @State private var structured: MealRecipe
     @State private var includesRecipe: Bool
     @State private var showRecipe = false
+    @State private var recipeSection = 0
     @State private var name: String
     @State private var note: String
     @State private var recipe: String
     @State private var recipeURL: String
     @State private var place: Place?
     @State private var loading = false
-    @State private var showPlaces = false
     @State private var error: String?
     @State private var syncing = false
+    @Query private var allMeals: [Meal]
+    @State private var categories: [String]
+    @State private var menuBookID: String
+    @AppStorage("menuBooks") private var storedBooks = "[]"
+    @State private var newCategory = ""
+    @State private var addingCategory = false
+    @AppStorage("recipeCategories") private var storedCategories = "[]"
 
-    init(meal: Meal?, initialDate: Date? = nil, onSaved: ((Meal) -> Void)? = nil) {
+
+    init(meal: Meal?, initialDate: Date? = nil, initialPhoto: Data? = nil, initialBookID: String = MenuBook.defaultID, onSaved: ((Meal) -> Void)? = nil) {
         self.meal = meal
         self.initialDate = initialDate
         self.onSaved = onSaved
-        _photo = State(initialValue: meal?.photo)
-        _originalPhoto = State(initialValue: meal?.originalPhoto ?? meal?.photo)
+        _photo = State(initialValue: meal?.photo ?? initialPhoto)
+        _originalPhoto = State(initialValue: meal?.originalPhoto ?? meal?.photo ?? initialPhoto)
         _selectedPlateID = State(initialValue: meal?.selectedPlateID)
+        _photoFraming = State(initialValue: meal?.photoFraming)
         _date = State(initialValue: meal?.date ?? initialDate ?? .now)
-        _includesDate = State(initialValue: meal?.recordedDate != nil || initialDate != nil)
+        _includesDate = State(initialValue: meal == nil || meal?.recordedDate != nil || initialDate != nil)
         let existingRecipe = MealRecipe(contents: meal?.structuredRecipe)
         _structured = State(initialValue: existingRecipe)
-        _includesRecipe = State(initialValue: !existingRecipe.isEmpty ||
-                                !(meal?.recipe.isEmpty ?? true) || !(meal?.recipeURL.isEmpty ?? true))
+        _includesRecipe = State(initialValue: true)
+        _categories = State(initialValue: meal?.categories ?? [])
+        _menuBookID = State(initialValue: meal?.menuBookID ?? initialBookID)
         _name = State(initialValue: meal?.name ?? "")
         _note = State(initialValue: meal?.note ?? "")
         _recipe = State(initialValue: meal?.recipe ?? "")
@@ -77,8 +87,19 @@ struct MealEditor: View {
                             .background(ink.opacity(0.025), in: .rect(cornerRadius: 12))
                             .overlay { RoundedRectangle(cornerRadius: 12).strokeBorder(ink.opacity(0.13)) }
                     }
+                    editorSection("ひとこと") {
+                        TextField("メモを追加（任意）", text: $note, axis: .vertical)
+                    }
+                    editorSection("メニューブック") {
+                        Picker("保存先", selection: $menuBookID) {
+                            ForEach(MenuBook.decode(storedBooks)) { book in
+                                Text(verbatim: book.name).tag(book.id)
+                            }
+                        }.pickerStyle(.menu)
+                    }
+                    categoryEditor
                     if let originalPhoto {
-                        PhotoPlating(original: originalPhoto, photo: $photo, working: $styling, plateID: $selectedPlateID)
+                        PhotoPlating(original: originalPhoto, photo: $photo, working: $styling, plateID: $selectedPlateID, framing: $photoFraming)
                             .id(originalPhoto)
                             .disabled(loading || syncing)
                     }
@@ -88,24 +109,7 @@ struct MealEditor: View {
                             DatePicker("食事の日", selection: $date, displayedComponents: .date)
                         }
                     }
-                    editorSection("場所") {
-                        Button { showPlaces = true } label: {
-                            HStack {
-                                Label(place?.name ?? "場所を選ぶ", systemImage: "mappin")
-                                Spacer()
-                                Image(systemName: "chevron.right").font(.caption)
-                            }
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    editorSection("ひとこと") {
-                        TextField("メモを追加（任意）", text: $note, axis: .vertical)
-                    }
                     editorSection("レシピ") {
-                        Toggle("レシピを追加", isOn: $includesRecipe)
-                            .onChange(of: includesRecipe) { _, enabled in
-                                if enabled { showRecipe = true }
-                            }
                         if includesRecipe {
                             Button { showRecipe = true } label: {
                                 HStack {
@@ -122,7 +126,7 @@ struct MealEditor: View {
             }
             .scrollDismissesKeyboard(.interactively)
             .background(paper.ignoresSafeArea())
-            .navigationTitle(meal == nil ? "食事を追加" : "食事を編集")
+            .navigationTitle(LocalizedStringKey(meal == nil ? "レシピを追加" : "レシピを編集"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -132,27 +136,35 @@ struct MealEditor: View {
                     .accessibilityLabel("キャンセル")
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存", systemImage: "checkmark", action: save)
-                        .labelStyle(.iconOnly)
+                    Button("レシピを保存", systemImage: "checkmark", action: save)
+                        .font(.system(.body).weight(.semibold))
                     .disabled(photo == nil || loading || syncing || styling)
-                    .accessibilityLabel("保存")
+                    .accessibilityLabel("レシピを保存")
                 }
             }
-            .navigationDestination(isPresented: $showPlaces) { PlacePicker(selection: $place) }
             .navigationDestination(isPresented: $showRecipe) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
-                        MealRecipeEditor(recipe: $structured)
-                        if !(meal?.recipe.isEmpty ?? true) {
-                            TextField("レシピメモ", text: $recipe, axis: .vertical).lineLimit(3...10)
-                        }
-                        TextField("レシピのURL（任意）", text: $recipeURL)
-                            .textFieldStyle(.roundedBorder)
-                            .keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
+                VStack(spacing: 16) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(name.isEmpty ? AppLanguage.text("料理名未設定") : name).font(.title2.bold())
+                        servingsPicker
+                        Picker("レシピの編集", selection: $recipeSection) {
+                            Text("材料").tag(0)
+                            Text("手順").tag(1)
+                        }.pickerStyle(.segmented)
+                    }.padding(.horizontal, 22).padding(.top, 12)
+                    ZStack {
+                        recipeEditorPage(ingredients: true)
+                            .opacity(recipeSection == 0 ? 1 : 0)
+                            .allowsHitTesting(recipeSection == 0).accessibilityHidden(recipeSection != 0)
+                        recipeEditorPage(ingredients: false)
+                            .opacity(recipeSection == 1 ? 1 : 0)
+                            .allowsHitTesting(recipeSection == 1).accessibilityHidden(recipeSection != 1)
                     }
-                    .padding(22)
                 }
-                .scrollDismissesKeyboard(.interactively)
+                .onAppear {
+                    if structured.steps.isEmpty { structured.steps.append("") }
+                }
+                .onChange(of: recipeSection) { _, _ in hideKeyboard() }
                 .background(paper.ignoresSafeArea())
                 .navigationTitle("レシピ")
                 .navigationBarTitleDisplayMode(.inline)
@@ -163,20 +175,108 @@ struct MealEditor: View {
                 }
             }
             .sheet(isPresented: $showingCrop) {
-                if let data = cropSource ?? originalPhoto, let image = UIImage(data: data) {
-                    MealPhotoCropper(image: image) { cropped in
-                        selectedPlateID = nil
-                        originalPhoto = cropped
-                        photo = cropped
-                        styling = false
+                if let data = originalPhoto ?? cropSource {
+                    if let frame = PhotoFrame.decode(photoFraming),
+                       ["丸", "花形", "ひし形", "波形", "六角形", "角丸", "楕円"].contains(frame.shape) {
+                        ShapeCropSource(original: data, frame: frame) { updated, result in
+                            photoFraming = updated.encoded
+                            photo = result
+                            styling = false
+                        }
+                    } else if let image = UIImage(data: data) {
+                        MealPhotoCropper(image: image) { cropped in
+                            selectedPlateID = nil
+                            photoFraming = nil
+                            cropSource = nil
+                            originalPhoto = cropped
+                            photo = cropped
+                            styling = false
+                        }
                     }
                 }
             }
             .task(id: item) { await loadPhoto(item) }
-            .alert(error ?? "", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
+            .alert(AppLanguage.text(error ?? ""), isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
                 Button("閉じる", role: .cancel) {}
             }
         }
+    }
+
+    private var availableCategories: [String] {
+        RecipeCategories.normalized(RecipeCategories.decode(storedCategories) + allMeals.filter { $0.wantToVisit != true }.flatMap(\.categories) + categories)
+            .sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+    }
+
+    private var categoryEditor: some View {
+        editorSection("カテゴリ") {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    editorCategoryChip(nil)
+                    Button {
+                        newCategory = ""
+                        addingCategory = true
+                    } label: {
+                        Image(systemName: "plus").font(.subheadline.weight(.medium))
+                            .frame(width: 44, height: 40)
+                            .background(ink.opacity(0.06), in: .capsule)
+                    }.buttonStyle(.plain).accessibilityLabel("カテゴリを追加")
+                    ForEach(availableCategories, id: \.self) { category in
+                        editorCategoryChip(category)
+                    }
+                }
+            }
+        }
+        .alert("カテゴリを追加", isPresented: $addingCategory) {
+            TextField("カテゴリ名", text: $newCategory)
+            Button("追加", action: addCategory)
+                .disabled(newCategory.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            Button("キャンセル", role: .cancel) { newCategory = "" }
+        }
+    }
+
+    private func editorCategoryChip(_ category: String?) -> some View {
+        let selected = category.map { name in categories.contains { RecipeCategories.matches($0, name) } } ?? categories.isEmpty
+        return Button {
+            categories = category.map { [$0] } ?? []
+        } label: {
+            Text(verbatim: category ?? "All")
+                .font(.subheadline.weight(.medium))
+                .padding(.horizontal, 14).padding(.vertical, 10)
+                .foregroundStyle(selected ? .white : ink)
+                .background(selected ? ink : ink.opacity(0.06), in: .capsule)
+        }.buttonStyle(.plain).accessibilityAddTraits(selected ? .isSelected : [])
+    }
+
+    private func addCategory() {
+        let clean = newCategory.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !clean.isEmpty else { return }
+        let existing = availableCategories.first { RecipeCategories.matches($0, clean) } ?? clean
+        categories = [existing]
+        storedCategories = RecipeCategories.encode(availableCategories + [existing])
+        newCategory = ""
+    }
+
+    private var servingsPicker: some View {
+        Stepper("\(structured.servings)人前", value: Binding(
+            get: { structured.servings }, set: { structured.changeServings(to: $0) }
+        ), in: 1...99)
+    }
+
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+
+    private func recipeEditorPage(ingredients: Bool) -> some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                MealRecipeEditor(recipe: $structured, showsIngredients: ingredients, showsSteps: !ingredients)
+                if !ingredients {
+                    if !(meal?.recipe.isEmpty ?? true) {
+                        TextField("レシピメモ", text: $recipe, axis: .vertical).lineLimit(3...10)
+                    }
+                }
+            }.padding(22)
+        }.scrollDismissesKeyboard(.interactively)
     }
 
     private func editorSection<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
@@ -222,20 +322,25 @@ struct MealEditor: View {
 
     private func save() {
         guard let photo, !syncing, !styling else { return }
-        let record = meal ?? Meal(photo: photo, name: name, date: date, place: place)
+        let record = meal ?? Meal(photo: photo, name: name, date: date, place: nil)
         if meal == nil { context.insert(record) }
         record.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         if record.photo != photo { record.photo = photo }
         record.selectedPlateID = selectedPlateID
+        record.photoFraming = photoFraming
         record.originalPhoto = originalPhoto == photo ? nil : originalPhoto
         record.date = date
         record.dateOmitted = !includesDate
         record.note = note
+        record.categories = categories
+        record.menuBookID = menuBookID == MenuBook.defaultID ? nil : menuBookID
         let cleanURL = includesRecipe ? recipeURL.trimmingCharacters(in: .whitespacesAndNewlines) : ""
         let recipeNote = includesRecipe ? recipe : ""
         var cleanRecipe = structured
         cleanRecipe.steps = cleanRecipe.steps.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
+        for index in cleanRecipe.steps.indices.reversed() where cleanRecipe.steps[index].isEmpty {
+            cleanRecipe.removeStep(at: index)
+        }
         let contents = includesRecipe ? cleanRecipe.contents : nil
         if record.recipe != recipeNote || record.recipeURL != cleanURL ||
             MealRecipe(contents: record.structuredRecipe).contents != contents {
@@ -244,24 +349,10 @@ struct MealEditor: View {
             record.recipeURL = cleanURL
             record.recipeUpdatedAt = .now
         }
-        record.setPlace(place)
         do {
             try context.save()
             onSaved?(record)
-            guard MapCloud.enabled, meal != nil, record.recipeUpdatedAt != nil else {
-                dismiss()
-                return
-            }
-            syncing = true
-            Task { @MainActor in
-                defer { syncing = false }
-                do {
-                    try await MapCloud.syncPublishedRecipe(record)
-                    dismiss()
-                } catch {
-                    self.error = "端末に保存しました。共有マップの同期に失敗しました。保存を押すと再試行できます。"
-                }
-            }
+            dismiss()
         } catch {
             context.rollback()
             self.error = "保存できませんでした。もう一度お試しください。"
@@ -297,6 +388,7 @@ struct MealEditor: View {
                 }
             }
             selectedPlateID = nil
+                        photoFraming = nil
             cropSource = encoded
             originalPhoto = encoded
             photo = encoded
@@ -318,168 +410,5 @@ struct MealEditor: View {
         }
         formatter.dateFormat = "yyyy:MM:dd HH:mm:ss"
         return formatter.date(from: raw)
-    }
-}
-
-struct PlacePicker: View {
-    @Binding var selection: Place?
-    var allowsHome = true
-    var initialQuery = ""
-    @Environment(\.dismiss) private var dismiss
-    @Query private var meals: [Meal]
-    @State private var query = ""
-    @StateObject private var suggestions = PlaceSuggestions()
-    @State private var resolving = false
-    @State private var suggestionError = false
-    @State private var results: [Place] = []
-    @State private var status = ""
-
-    private var savedPlaces: [Place] {
-        var seen = Set<String>()
-        return meals.compactMap(\.place).filter { $0.coordinate != nil && seen.insert($0.id).inserted }
-            .filter { query.isEmpty || ($0.name + $0.address).localizedStandardContains(query) }
-            .sorted { $0.name < $1.name }
-    }
-
-    var body: some View {
-        List {
-            Section {
-                if allowsHome { placeRow(.home) }
-                if selection != nil {
-                    Button("場所を外す", role: .destructive) { select(nil) }
-                }
-            }
-            if !savedPlaces.isEmpty {
-                Section("記録済みの場所") {
-                    ForEach(savedPlaces) { placeRow($0) }
-                }
-            }
-            if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                Section("検索結果") {
-                    if resolving { ProgressView("場所を確認中…") }
-                    if !status.isEmpty && suggestions.matches.isEmpty {
-                        Text(status).foregroundStyle(.secondary)
-                    }
-                    ForEach(results) { placeRow($0) }
-                }
-            }
-            if !suggestions.matches.isEmpty {
-                Section("店名・施設の候補") {
-                    ForEach(suggestions.matches, id: \.self) { item in
-                        Button {
-                            Task { await resolve(item) }
-                        } label: {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Label(item.title, systemImage: "mappin")
-                                if !item.subtitle.isEmpty {
-                                    Text(item.subtitle).font(.caption).foregroundStyle(.secondary)
-                                }
-                            }
-                        }
-                        .disabled(resolving)
-                    }
-                }
-            }
-        }
-        .navigationTitle("場所を選ぶ")
-        .navigationBarTitleDisplayMode(.inline)
-        .onAppear { if query.isEmpty { query = initialQuery } }
-        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "店名・地名で検索")
-        .task(id: query) {
-            suggestions.update(query)
-            await search(query)
-        }
-        .alert("場所を開けませんでした", isPresented: $suggestionError) {
-            Button("閉じる", role: .cancel) {}
-        }
-    }
-
-    private func placeRow(_ place: Place) -> some View {
-        Button { select(place) } label: {
-            VStack(alignment: .leading, spacing: 4) {
-                Label(place.name, systemImage: place.id == "home" ? "house" : "mappin")
-                if !place.address.isEmpty {
-                    Text(place.address).font(.system(.caption)).foregroundStyle(.secondary)
-                }
-            }
-        }
-    }
-
-    private func select(_ place: Place?) {
-        selection = place
-        dismiss()
-    }
-
-    @MainActor private func resolve(_ completion: MKLocalSearchCompletion) async {
-        guard !resolving else { return }
-        resolving = true
-        defer { resolving = false }
-        do {
-            let request = MKLocalSearch.Request(completion: completion)
-            let response = try await MKLocalSearch(request: request).start()
-            guard let result = response.mapItems.first else {
-                suggestionError = true
-                return
-            }
-            select(Place(result))
-        } catch {
-            suggestionError = true
-        }
-    }
-
-    private func search(_ query: String) async {
-        let term = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        results = []
-        status = ""
-        guard !term.isEmpty else { return }
-        status = "検索中…"
-        do {
-            try await Task.sleep(for: .milliseconds(350))
-            let request = MKLocalSearch.Request()
-            request.naturalLanguageQuery = term
-            request.resultTypes = [.address, .pointOfInterest]
-            let search = MKLocalSearch(request: request)
-            let response = try await withTaskCancellationHandler {
-                try await search.start()
-            } onCancel: {
-                search.cancel()
-            }
-            guard !Task.isCancelled else { return }
-            var seen = Set<String>()
-            results = response.mapItems.map(Place.init).filter { seen.insert($0.id).inserted }
-            status = results.isEmpty ? "場所が見つかりませんでした" : ""
-        } catch {
-            if !Task.isCancelled {
-                status = (error as? MKError)?.code == .placemarkNotFound
-                    ? "場所が見つかりませんでした" : "検索できませんでした。通信状況を確認してください。"
-            }
-        }
-    }
-}
-
-
-private final class PlaceSuggestions: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
-    @Published private(set) var matches: [MKLocalSearchCompletion] = []
-    private let completer = MKLocalSearchCompleter()
-
-    override init() {
-        super.init()
-        completer.resultTypes = [.pointOfInterest, .address]
-        completer.delegate = self
-    }
-
-    func update(_ query: String) {
-        let term = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        completer.cancel()
-        matches = []
-        if !term.isEmpty { completer.queryFragment = term }
-    }
-
-    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-        matches = Array(completer.results.prefix(12))
-    }
-
-    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
-        matches = []
     }
 }
