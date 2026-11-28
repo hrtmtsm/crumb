@@ -2,22 +2,29 @@ import SwiftUI
 
 struct RecipeIngredient: Codable, Identifiable {
     var id = UUID()
-    let name: String
+    var name: String
     var amount: Double?
-    let unit: String
+    var unit: String
+    var foodID: String?
+    var weightGrams: Double?
+    var rawAmount: String?
 
     func quantity(multiplier: Double) -> String {
-        guard let amount else { return unit }
-        let value = (amount * multiplier).formatted(.number.precision(.fractionLength(0...3)))
+        guard let amount, !["to taste", "as needed"].contains(unit.lowercased()) else { return unit }
+        let value = (amount * multiplier).formatted(.number.precision(.fractionLength(0...3)).locale(AppLanguage.locale))
         return unit.isEmpty ? value : "\(value) \(unit)"
     }
 }
 
 struct MealRecipe: Codable {
-    var servings = 2
+    var servings = 1
     var ingredients: [RecipeIngredient] = []
     var steps: [String] = []
     var stepIngredients: [[UUID]]?
+    var servingsKnown: Bool?
+    var originRecipeID: UUID?
+    var coverIsAI: Bool?
+    var mealComponents: [MealComponent]?
 
     func linkedIngredients(for step: Int) -> [RecipeIngredient] {
         guard let links = stepIngredients, links.indices.contains(step) else { return [] }
@@ -46,31 +53,11 @@ struct MealRecipe: Codable {
         let next = min(99, max(1, count))
         guard next != servings else { return }
         let multiplier = Double(next) / Double(servings)
-        var replacements: [(String, String)] = []
         for index in ingredients.indices {
-            let old = [ingredients[index].name, ingredients[index].quantity(multiplier: 1)]
-                .filter { !$0.isEmpty }.joined(separator: " ")
             if let amount = ingredients[index].amount { ingredients[index].amount = amount * multiplier }
-            let new = [ingredients[index].name, ingredients[index].quantity(multiplier: 1)]
-                .filter { !$0.isEmpty }.joined(separator: " ")
-            if old != new { replacements.append((old, new)) }
+            if let grams = ingredients[index].weightGrams { ingredients[index].weightGrams = grams * multiplier }
         }
-        // Replace all matching inserted ingredient phrases in one pass, avoiding cascaded replacements.
-        for index in steps.indices {
-            let source = steps[index]
-            var result = ""
-            var cursor = source.startIndex
-            let ordered = replacements.sorted { $0.0.count > $1.0.count }
-            while cursor < source.endIndex {
-                if let match = ordered.first(where: { source[cursor...].hasPrefix($0.0) }) {
-                    result += match.1
-                    cursor = source.index(cursor, offsetBy: match.0.count)
-                } else {
-                    result.append(source[cursor]); cursor = source.index(after: cursor)
-                }
-            }
-            steps[index] = result
-        }
+        // Free text (including temperatures and cooking times) is never rewritten.
         servings = next
     }
     mutating func moveStep(from source: Int, to destination: Int) {
@@ -89,7 +76,7 @@ struct MealRecipe: Codable {
     }
 
 
-    var isEmpty: Bool { ingredients.isEmpty && steps.isEmpty }
+    var isEmpty: Bool { ingredients.isEmpty && steps.isEmpty && !isMeal }
 
     init() {}
 
@@ -104,58 +91,60 @@ struct MealRecipe: Codable {
     var contents: String? {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys
-        guard !isEmpty, let data = try? encoder.encode(self) else { return nil }
+        guard !isEmpty || servingsKnown == false || originRecipeID != nil || coverIsAI == true else { return nil }
+        guard let data = try? encoder.encode(self) else { return nil }
         return String(decoding: data, as: UTF8.self)
     }
+}
+
+enum RecipeEditorField: Hashable {
+    case dishName, note, source, additionalNotes, category
+    case name(UUID), amount(UUID), unit(UUID), step(Int)
 }
 
 struct MealRecipeEditor: View {
     @Binding var recipe: MealRecipe
     var showsIngredients = true
     var showsSteps = true
-    @State private var name = ""
-    @State private var amount = ""
-    @State private var unit = ""
     @FocusState private var focusedStep: Int?
-
-    private var parsedAmount: Double? {
-        if let value = Double(amount.replacingOccurrences(of: ",", with: ".")), value.isFinite, value > 0 {
-            return value
-        }
-        return nil
-    }
+    @FocusState private var focusedIngredient: UUID?
+    @State private var newIngredientID: UUID?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if showsIngredients {
             Text("材料").font(.subheadline.weight(.semibold))
-            IngredientTagLayout(spacing: 7) {
-                ForEach(recipe.ingredients) { ingredient in
+            ForEach($recipe.ingredients) { $ingredient in
+                HStack(spacing: 8) {
+                    TextField("材料名", text: $ingredient.name)
+                        .focused($focusedIngredient, equals: ingredient.id)
+                        .frame(maxWidth: .infinity)
+                    TextField("量", text: Binding(
+                        get: { ingredient.rawAmount ?? RecipeQuantity.text(ingredient.amount) },
+                        set: { ingredient.rawAmount = $0; ingredient.amount = RecipeQuantity.parse($0) }
+                    )).keyboardType(.decimalPad).frame(width: 60)
+                    TextField("単位", text: $ingredient.unit).frame(width: 72)
                     Button {
+                        CrumbHaptics.tap()
                         recipe.removeIngredient(ingredient.id)
                     } label: {
-                        HStack {
-                            Text([ingredient.name, ingredient.quantity(multiplier: 1)]
-                                .filter { !$0.isEmpty }.joined(separator: " "))
-                            Image(systemName: "xmark").font(.caption2)
-                        }
-                        .font(.caption)
-                        .padding(.horizontal, 10).padding(.vertical, 8)
-                        .background(ink.opacity(0.06), in: Capsule())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityHint("材料を削除")
+                        Image(systemName: "minus.circle").frame(width: 28, height: 44)
+                    }.buttonStyle(.plain).accessibilityLabel("材料を削除")
+                }.textFieldStyle(.roundedBorder)
+            }
+            Button {
+                CrumbHaptics.tap()
+                let ingredient = RecipeIngredient(name: "", unit: "")
+                recipe.ingredients.append(ingredient)
+                newIngredientID = ingredient.id
+            } label: {
+                HStack(spacing: 7) {
+                    Image(systemName: "plus")
+                    Text("材料を追加").fixedSize()
                 }
-            }
-            TextField("材料名", text: $name).textFieldStyle(.roundedBorder)
-                .submitLabel(.done).onSubmit(addIngredient)
-            HStack {
-                TextField("量", text: $amount).textFieldStyle(.roundedBorder).keyboardType(.decimalPad)
-                TextField("単位・適量など", text: $unit).textFieldStyle(.roundedBorder)
-                Button("追加", action: addIngredient)
-                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-                              (!amount.isEmpty && parsedAmount == nil))
-            }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
+            }.buttonStyle(.plain)
             }
             if showsSteps {
             Text("手順").font(.subheadline.weight(.semibold))
@@ -214,21 +203,27 @@ struct MealRecipeEditor: View {
 
                 }
             }
-            Button("手順を追加", systemImage: "plus") { recipe.steps.append("") }
+            Button { recipe.steps.append("") } label: {
+                HStack(spacing: 7) {
+                    Image(systemName: "plus")
+                    Text("手順を追加").fixedSize()
+                }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
+            }.buttonStyle(.plain)
             }
+        }
+        .task(id: newIngredientID) {
+            guard let id = newIngredientID else { return }
+            await Task.yield()
+            guard !Task.isCancelled else { return }
+            focusedIngredient = id
+            newIngredientID = nil
         }
     }
 
-    private func addIngredient() {
-        let cleanName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !cleanName.isEmpty, amount.isEmpty || parsedAmount != nil else { return }
-        recipe.ingredients.append(RecipeIngredient(name: cleanName, amount: parsedAmount,
-                                                   unit: unit.trimmingCharacters(in: .whitespacesAndNewlines)))
-        name = ""
-        amount = ""
-        unit = ""
-    }
 }
+
 
 struct RecipeContent: View {
     let recipe: MealRecipe
@@ -259,17 +254,13 @@ struct RecipeContent: View {
                             Text("\(index + 1).").fontWeight(.semibold)
                             Text(step).fixedSize(horizontal: false, vertical: true)
                         }
-                        if showsIngredientTags {
-                        IngredientTagLayout(spacing: 6) {
-                            ForEach(recipe.ingredients) { ingredient in
-                                Text([ingredient.name, ingredient.quantity(multiplier: Double(servings) / Double(recipe.servings))]
-                                    .filter { !$0.isEmpty }.joined(separator: " "))
-                                    .font(.caption).padding(.horizontal, 10).padding(.vertical, 6)
-                                    .background(ink.opacity(0.04), in: .capsule)
-                                    .overlay(Capsule().stroke(ink.opacity(0.12), lineWidth: 0.7))
-                            }
-                        }.padding(.leading, 22)
+                        if !recipe.linkedIngredients(for: index).isEmpty {
+                            Text(recipe.linkedIngredients(for: index).map {
+                                [$0.name, $0.quantity(multiplier: Double(servings) / Double(recipe.servings))].filter { !$0.isEmpty }.joined(separator: " ")
+                            }.joined(separator: " · "))
+                            .font(.subheadline).foregroundStyle(secondaryInk).padding(.leading, 22)
                         }
+
                     }
                 }
             }

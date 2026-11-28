@@ -5,6 +5,7 @@ configs:
   Debug: debug
   Release: release
   Device Preview: debug
+  Purchase Preview: debug
 schemes:
   crumb (iCloud):
     build:
@@ -12,6 +13,17 @@ schemes:
         crumb: all
     run:
       config: Debug
+  crumb Purchase Preview:
+    build:
+      targets:
+        crumb: all
+    run:
+      config: Purchase Preview
+      storeKitConfiguration: StoreKit/Crumb.storekit
+    test:
+      config: Purchase Preview
+      targets: [CrumbTests]
+      parallelizable: false
   crumb Device Preview:
     build:
       targets:
@@ -32,18 +44,32 @@ targets:
     platform: iOS
     deploymentTarget: "17.0"
     sources: [Crumb]
+    dependencies:
+      - target: CrumbShare
+        embed: true
     configFiles:
       Debug: Config/Defaults.xcconfig
       Release: Config/Defaults.xcconfig
       Device Preview: Config/Defaults.xcconfig
+      Purchase Preview: Config/Defaults.xcconfig
     info:
       path: CrumbInfo.plist
       properties:
+        CFBundleVersion: "1"
+        CFBundleShortVersionString: "0.2.0"
         CFBundleIcons:
           CFBundlePrimaryIcon:
             CFBundleIconFiles: [CrumbIcon]
+        NSSpeechRecognitionUsageDescription: 材料や作り方を音声で入力します。対応端末では端末内で文字に変換します。
+        NSMicrophoneUsageDescription: 材料や作り方の音声入力にマイクを使います。
         NSCameraUsageDescription: ガイドに合わせて料理やお皿を撮影し、レシピに保存します。
         NSPhotoLibraryUsageDescription: レシピに使う料理写真を最近の写真から選びます。
+        CFBundleURLTypes:
+          - CFBundleURLSchemes: [crumb]
+        CrumbAIEnabled: $(CRUMB_AI_ENABLED)
+        CrumbCloudEnabled: $(CRUMB_CLOUD_ENABLED)
+        CrumbPrivacyURL: $(CRUMB_PRIVACY_URL)
+        CrumbTermsURL: $(CRUMB_TERMS_URL)
         CrumbSupabaseURL: $(SUPABASE_URL)
         CrumbSupabaseKey: $(SUPABASE_PUBLISHABLE_KEY)
         UIAppFonts: [BricolageGrotesque-Bold.ttf, Nunito-Regular.ttf, Nunito-SemiBold.ttf, Nunito-Medium.ttf]
@@ -59,9 +85,67 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
         SWIFT_VERSION: "5.0"
       configs:
+        Purchase Preview:
+          CODE_SIGN_ENTITLEMENTS: ""
+          CODE_SIGN_STYLE: Automatic
+          PRODUCT_BUNDLE_IDENTIFIER: app.tabinote.meals.purchases
+          INFOPLIST_KEY_CFBundleDisplayName: crumb Purchases
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) DEBUG CRUMB_STOREKIT_LOCAL"
         Device Preview:
           CODE_SIGN_ENTITLEMENTS: ""
           CODE_SIGN_STYLE: Automatic
-          PRODUCT_BUNDLE_IDENTIFIER: app.tabinote.meals.preview
+          PRODUCT_BUNDLE_IDENTIFIER: app.tabinote.meals
           INFOPLIST_KEY_CFBundleDisplayName: crumb Preview
-          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) CRUMB_DEVICE_PREVIEW"
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) DEBUG CRUMB_DEVICE_PREVIEW"
+
+  CrumbShare:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: ShareExtension/ShareViewController.swift
+      - path: Crumb/RecipeInbox.swift
+    info:
+      path: CrumbShareInfo.plist
+      properties:
+        CFBundleDisplayName: crumb
+        CFBundleVersion: "1"
+        CFBundleShortVersionString: "0.2.0"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsWebURLWithMaxCount: 1
+              NSExtensionActivationSupportsText: true
+    settings:
+      base:
+        DEVELOPMENT_TEAM: DW8V3D3NS2
+        PRODUCT_BUNDLE_IDENTIFIER: app.tabinote.meals.share
+        CODE_SIGN_ENTITLEMENTS: CrumbShare.entitlements
+        SWIFT_VERSION: "5.0"
+        SKIP_INSTALL: YES
+      configs:
+        Purchase Preview:
+          CODE_SIGN_ENTITLEMENTS: ""
+          PRODUCT_BUNDLE_IDENTIFIER: app.tabinote.meals.purchases.share
+        Device Preview:
+          CODE_SIGN_ENTITLEMENTS: ""
+          PRODUCT_BUNDLE_IDENTIFIER: app.tabinote.meals.share
+
+  CrumbTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: CrumbTests
+      - path: StoreKit/Crumb.storekit
+        buildPhase: resources
+    dependencies:
+      - target: crumb
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: app.tabinote.meals.tests
+        DEVELOPMENT_TEAM: DW8V3D3NS2
+        SWIFT_VERSION: "5.0"

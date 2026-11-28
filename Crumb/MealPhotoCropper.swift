@@ -38,7 +38,7 @@ struct MealPhotoCropper: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("キャンセル") { dismiss() }
+                    Button("キャンセル") { CrumbHaptics.tap(); dismiss() }
                 }
             }
         }
@@ -82,7 +82,7 @@ struct MealPhotoCropper: View {
                 })
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("適用") { save(side: side) }.fontWeight(.semibold)
+                    Button("適用") { CrumbHaptics.tap(); save(side: side) }.fontWeight(.semibold)
                 }
             }
     }

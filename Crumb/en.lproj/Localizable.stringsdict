@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>%lld人前</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@servings@</string>
+		<key>servings</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld serving</string>
+			<key>other</key>
+			<string>%lld servings</string>
+		</dict>
+	</dict>
+	<key>%lldレシピ</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@recipes@</string>
+		<key>recipes</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld recipe</string>
+			<key>other</key>
+			<string>%lld recipes</string>
+		</dict>
+	</dict>
+	<key>%lldブック・%lldレシピ</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@books@ · %2$#@recipes@</string>
+		<key>books</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld book</string>
+			<key>other</key>
+			<string>%lld books</string>
+		</dict>
+		<key>recipes</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>one</key>
+			<string>%lld recipe</string>
+			<key>other</key>
+			<string>%lld recipes</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

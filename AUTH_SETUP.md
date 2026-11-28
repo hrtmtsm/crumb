@@ -27,11 +27,11 @@ Enable Apple under Supabase → Authentication → Sign In / Providers, and allo
 
 Before deploying it, configure `APPLE_TEAM_ID`, `APPLE_CLIENT_ID`, `APPLE_KEY_ID`, and `APPLE_PRIVATE_KEY` in Edge Function secrets. The .p8 file must remain server-side. The function uses Supabase's automatic environment values for the service key. No real secrets are in the example.
 
-Deploy using an authenticated Supabase CLI, or the dashboard Edge Function editor. Keep JWT verification enabled. Create the private `crumb-photos` bucket using the SQL migration before testing deletion. Deletion fails closed if Apple secrets, token validation, revocation, or storage deletion fails; the app must never report successful deletion from a missing/unconfigured function.
+Deploy using an authenticated Supabase CLI, or the dashboard Edge Function editor. The handlers validate tokens themselves; follow `supabase/config.toml` for gateway settings. Create the private `crumb-photos` bucket using the SQL migration before testing deletion. Deletion fails closed if Apple secrets, token validation, revocation, or storage deletion fails; the app must never report successful deletion from a missing/unconfigured function.
 
 ## Database foundation and what is not yet syncing
 
-`supabase/migrations/202611240001_accounts.sql` is an additive migration for profiles, menu books, recipes and private image storage, with per-user Row Level Security. Apply only after reviewing existing table/bucket names; it intentionally fails on naming conflicts instead of overwriting existing policies.
+`supabase/archive/202611240001_accounts.proposal.sql` is an additive migration for profiles, menu books, recipes and private image storage, with per-user Row Level Security. Apply only after reviewing existing table/bucket names; it intentionally fails on naming conflicts instead of overwriting existing policies.
 
 **This change implements authentication, not cloud recipe synchronization.** Recipes and profile edits still live locally in the scoped stores. It does not upload existing guest photos, migrate them into an account, or restore recipes from another device. Those require a separate, explicit import/sync implementation after the auth connection is tested. The welcome screen describes local storage accordingly.
 
@@ -44,3 +44,7 @@ Deploy using an authenticated Supabase CLI, or the dashboard Edge Function edito
 - Test token expiration/refresh and Apple credential revocation.
 - Test account deletion against a dedicated test account after deploying the function and Apple secrets. Do not use a real account for destructive testing.
 - Before App Store submission: complete a public privacy policy, privacy disclosures, real-device Apple login, deletion/revocation, and recovery tests. Do not claim cloud backup/sync until it is implemented and tested.
+
+## 2026-11-28 update
+
+See `PLAN_SETUP.md` for the new library/plan schema applied to Supabase and the client sync implementation. Cloud remains disabled pending deployment and real-device validation. The earlier sections describe the original auth-only milestone; they do not imply that the new cloud functions are deployed.

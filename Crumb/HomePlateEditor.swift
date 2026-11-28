@@ -17,21 +17,8 @@ struct HomePlateEditor: View {
     @State private var reviewingPlacement = false
     @State private var processing = false
     @State private var error: String?
-    @State private var silhouette: Silhouette = .automatic
+    @State private var guide: PlateCaptureGuide = .round
     @State private var saving = false
-
-    private enum Silhouette: String, CaseIterable, Identifiable {
-        case automatic = "自動"
-        case round = "丸皿"
-        case scalloped = "波縁"
-        case square = "角皿"
-        var id: Self { self }
-    }
-
-    private struct CutoutChoice: Equatable {
-        let source: Data?
-        let silhouette: Silhouette
-    }
 
     var body: some View {
         ScrollView {
@@ -50,7 +37,7 @@ struct HomePlateEditor: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("キャンセル", action: onCancel)
+                Button("キャンセル", action: CrumbHaptics.action(onCancel))
             }
         }
         .task(id: item) {
@@ -66,13 +53,22 @@ struct HomePlateEditor: View {
                 if !Task.isCancelled { self.error = "写真を読み込めませんでした。" }
             }
         }
-        .task(id: CutoutChoice(source: source, silhouette: silhouette)) { await prepareCutout() }
+        .task(id: source) { await prepareCutout() }
         .fullScreenCover(isPresented: $showingCamera) {
-            PlateCamera { image in
+            PlateCamera(guide: guide) { image in
                 showingCamera = false
                 if let data = image?.jpegData(compressionQuality: 0.92) { setPhoto(data) }
             }
             .ignoresSafeArea()
+            .overlay(alignment: .top) {
+                Picker("撮影ガイド", selection: $guide) {
+                    ForEach(PlateCaptureGuide.allCases) { Text(LocalizedStringKey($0.rawValue)).tag($0) }
+                }
+                .pickerStyle(.segmented)
+                .padding(12)
+                .background(.regularMaterial, in: Capsule())
+                .padding(.horizontal, 24).padding(.top, 54)
+            }
         }
         .sheet(isPresented: $adjustingCrop) {
             if let source, let image = UIImage(data: source) {
@@ -86,11 +82,11 @@ struct HomePlateEditor: View {
             Text("空のお皿を真上から撮って、縁まで写真に入れてください。")
                 .font(.subheadline).foregroundStyle(.secondary)
             HStack {
-                Button("撮影する", systemImage: "camera", action: openCamera)
+                Button("撮影する", systemImage: "camera", action: CrumbHaptics.action(openCamera))
                     .buttonStyle(.bordered)
                 PhotosPicker(selection: $item, matching: .images) {
                     Label("写真を選ぶ", systemImage: "photo")
-                }
+                }.hapticActivation()
                 .buttonStyle(.bordered)
             }
             if let source {
@@ -101,12 +97,8 @@ struct HomePlateEditor: View {
                     if processing { ProgressView("お皿を切り抜いています").padding().background(.white, in: Capsule()) }
                 }
                 .frame(height: 245)
-                Picker("切り抜き範囲", selection: $silhouette) {
-                    ForEach(Silhouette.allCases) { Text(LocalizedStringKey($0.rawValue)).tag($0) }
-                }
-                .pickerStyle(.segmented)
-                Button("写真の範囲を調整", systemImage: "crop") { adjustingCrop = true }
-                Button("盛り付け位置を確認") { reviewingPlacement = true }
+                Button("写真の範囲を調整", systemImage: "crop") { CrumbHaptics.tap(); adjustingCrop = true }
+                Button("盛り付け位置を確認") { CrumbHaptics.tap(); reviewingPlacement = true }
                     .buttonStyle(.borderedProminent)
                     .disabled(platePhoto == nil || processing)
             }
@@ -123,8 +115,8 @@ struct HomePlateEditor: View {
             Slider(value: $placement.y, in: -0.22...0.22).accessibilityLabel("上下の位置")
             Text("料理の大きさ").font(.subheadline)
             Slider(value: $placement.scale, in: 0.28...0.86).accessibilityLabel("料理の大きさ")
-            Button("切り抜きに戻る") { reviewingPlacement = false }
-            Button("保存して使う") { save(photo) }
+            Button("切り抜きに戻る") { CrumbHaptics.tap(); reviewingPlacement = false }
+            Button("保存して使う") { CrumbHaptics.tap(); save(photo) }
                 .buttonStyle(.borderedProminent)
                 .disabled(saving)
         }
@@ -133,7 +125,6 @@ struct HomePlateEditor: View {
     private func setPhoto(_ data: Data) {
         source = data
         platePhoto = nil
-        silhouette = .automatic
         error = nil
     }
 
@@ -142,27 +133,18 @@ struct HomePlateEditor: View {
         platePhoto = nil
         processing = true
         error = nil
-        let shape = silhouette
         do {
-            let extracted: Data
-            switch shape {
-            case .automatic:
-                extracted = try await Task.detached(priority: .userInitiated) {
-                    try PlatingImage.plateForeground(from: source)
-                }.value
-            case .round, .scalloped, .square:
-                let pathName = shape == .round ? "丸" : shape == .scalloped ? "波形" : "角丸"
-                extracted = try PlatingImage.crop(source, shape: pathName, rim: .clear)
-            }
+            let extracted = try await Task.detached(priority: .userInitiated) {
+                try PlatingImage.plateForeground(from: source)
+            }.value
             try Task.checkCancellation()
             guard let image = UIImage(data: extracted) else { throw CocoaError(.fileReadCorruptFile) }
-            // Manual masks already have the same inset as the normalized plate.
-            platePhoto = shape == .automatic ? PlateRendering.normalize(image) : extracted
+            platePhoto = PlateRendering.normalize(image)
             processing = false
         } catch {
             guard !Task.isCancelled else { return }
             processing = false
-            self.error = "切り抜けませんでした。範囲を調整するか、お皿の形を選んでください。"
+            self.error = "切り抜けませんでした。お皿全体が写るように範囲を調整するか、背景と色の違う場所で撮り直してください。"
         }
     }
 
@@ -194,8 +176,10 @@ struct HomePlateEditor: View {
         do {
             let result = try PlateRendering.compose(food: food, on: option)
             context.insert(model)
-            do { try context.save() }
+            do { try context.save()
+            NotificationCenter.default.post(name: .crumbLibraryChanged, object: nil) }
             catch { context.delete(model); throw error }
+            CrumbHaptics.success()
             didSave(option, result)
         } catch {
             self.error = "お皿を保存できませんでした。もう一度お試しください。"
@@ -203,7 +187,15 @@ struct HomePlateEditor: View {
     }
 }
 
+private enum PlateCaptureGuide: String, CaseIterable, Identifiable {
+    case round = "丸皿"
+    case scalloped = "波縁"
+    case square = "角皿"
+    var id: Self { self }
+}
+
 private struct PlateCamera: UIViewControllerRepresentable {
+    let guide: PlateCaptureGuide
     let onFinish: (UIImage?) -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(onFinish: onFinish) }
@@ -214,6 +206,7 @@ private struct PlateCamera: UIViewControllerRepresentable {
         camera.cameraCaptureMode = .photo
         camera.delegate = context.coordinator
         let guide = CameraPlateGuide(frame: UIScreen.main.bounds)
+        guide.shape = self.guide
         guide.isUserInteractionEnabled = false
         guide.backgroundColor = .clear
         guide.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -221,7 +214,11 @@ private struct PlateCamera: UIViewControllerRepresentable {
         return camera
     }
 
-    func updateUIViewController(_ controller: UIImagePickerController, context: Context) {}
+    func updateUIViewController(_ controller: UIImagePickerController, context: Context) {
+        if let overlay = controller.cameraOverlayView as? CameraPlateGuide {
+            overlay.shape = guide
+        }
+    }
 
     final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         let onFinish: (UIImage?) -> Void
@@ -237,14 +234,21 @@ private struct PlateCamera: UIViewControllerRepresentable {
 }
 
 private final class CameraPlateGuide: UIView {
+    var shape: PlateCaptureGuide = .round { didSet { setNeedsDisplay() } }
+
     override func draw(_ rect: CGRect) {
         let side = min(bounds.width * 0.82, bounds.height * 0.62)
-        let guide = UIBezierPath(roundedRect: CGRect(x: bounds.midX - side / 2,
-                                                     y: bounds.height * 0.43 - side / 2,
-                                                     width: side, height: side), cornerRadius: side * 0.18)
+        let area = CGRect(x: bounds.midX - side / 2, y: bounds.height * 0.43 - side / 2,
+                          width: side, height: side)
+        let path: UIBezierPath
+        switch shape {
+        case .round: path = UIBezierPath(ovalIn: area)
+        case .square: path = UIBezierPath(roundedRect: area, cornerRadius: side * 0.08)
+        case .scalloped: path = PlatingImage.shapePath("波形", in: area)
+        }
         UIColor.white.setStroke()
-        guide.lineWidth = 2
-        guide.setLineDash([7, 5], count: 2, phase: 0)
-        guide.stroke()
+        path.lineWidth = 2
+        path.setLineDash([7, 5], count: 2, phase: 0)
+        path.stroke()
     }
 }

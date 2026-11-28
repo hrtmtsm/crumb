@@ -1,0 +1,9 @@
+# Native tokens are verified inside each handler using Supabase Auth / Apple's signature verifier.
+[functions.verify-entitlement]
+verify_jwt = false
+[functions.store-notifications]
+verify_jwt = false
+[functions.delete-account]
+verify_jwt = false
+[functions.ask-crumb]
+verify_jwt = false

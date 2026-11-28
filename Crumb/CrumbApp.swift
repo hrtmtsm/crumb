@@ -4,25 +4,52 @@ import SwiftData
 @main
 struct CrumbApp: App {
     @StateObject private var account = AccountStore()
+    @StateObject private var invites = InviteRouter()
     @AppStorage("appLanguage", store: .standard) private var language = AppLanguage.defaultCode
     // Keep the existing schema so recorded photos and recipes survive this UI change.
     private let store = try! ModelContainer(for: Meal.self, HomePlate.self,
         configurations: ModelConfiguration(cloudKitDatabase: .none))
+    init() {
+        if !UserDefaults.standard.bool(forKey: "assistantEnglishV1") {
+            UserDefaults.standard.set("en", forKey: "appLanguage")
+            UserDefaults.standard.set(true, forKey: "assistantEnglishV1")
+        }
+    }
     var body: some Scene {
         WindowGroup {
-            AccountRoot(guestStore: store).environmentObject(account)
+            AccountRoot(guestStore: store).environmentObject(account).environmentObject(invites)
+                .onOpenURL { invites.open($0) }
                 .environment(\.locale, Locale(identifier: language)).id(language)
                 .tint(clay).preferredColorScheme(.light)
         }
     }
 }
 
+enum AlbumRoute: Hashable {
+    case profile
+    case recipe(UUID)
+    case books
+}
+
 struct AlbumView: View {
+    @EnvironmentObject private var routes: InviteRouter
+    @EnvironmentObject private var plus: PlusStore
+    @EnvironmentObject private var cloud: CloudLibrary
+    @EnvironmentObject private var account: AccountStore
+    @State private var paywall = false
+    @State private var creating = false
+    @State private var failure: String?
+    private var editable: Bool { PlanPolicy.canEdit(book: cloud.resolved(selectedBook), viewer: account.session?.userID, plus: plus.hasPlus) }
     @Query(sort: \Meal.date, order: .reverse) private var meals: [Meal]
     @Environment(\.modelContext) private var context
     @Environment(\.dynamicTypeSize) private var dynamicType
+    @State private var rootTab = 0
+    @State private var rootKeyboardVisible = false
     @State private var adding = false
     @State private var query = ""
+    @State private var path: [AlbumRoute] = []
+    @State private var importDraft: RecipeDraft?
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showingSearch = false
     @FocusState private var searchFocused: Bool
     @State private var selectedCategory: String?
@@ -45,16 +72,56 @@ struct AlbumView: View {
         }
     }
     var body: some View {
-        NavigationStack {
+        VStack(spacing: 0) {
+            TabView(selection: $rootTab) {
+                menuPage.toolbar(.hidden, for: .tabBar).tag(0)
+                AskCrumbView(embedded: true).toolbar(.hidden, for: .tabBar).tag(1)
+            }.toolbar(.hidden, for: .tabBar)
+            if !rootKeyboardVisible { rootNavigationBar }
+        }
+        .background(.white)
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in rootKeyboardVisible = true }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in rootKeyboardVisible = false }
+    }
+    private var rootNavigationBar: some View {
+            HStack(spacing: 28) {
+                rootTabButton("Menu", symbol: "book", tab: 0)
+                Button { openAddRecipe() } label: {
+                    Image(systemName: "plus").font(.system(size: 25, weight: .medium))
+                        .foregroundStyle(.white).frame(width: 56, height: 56).background(ink, in: .circle)
+                }.buttonStyle(.plain).accessibilityLabel("レシピを追加")
+                rootTabButton("Explore", symbol: "sparkles", tab: 1)
+            }
+            .padding(.horizontal, 26).padding(.vertical, 10)
+            .frame(maxWidth: .infinity).background(.white)
+            .overlay(alignment: .top) { Rectangle().fill(ink.opacity(0.08)).frame(height: 0.5) }
+    }
+    private func rootTabButton(_ title: LocalizedStringKey, symbol: String, tab: Int) -> some View {
+        Button { CrumbHaptics.selection(); rootTab = tab } label: {
+            VStack(spacing: 4) {
+                Image(systemName: symbol).font(.system(size: 22))
+                Text(title).font(.caption.weight(rootTab == tab ? .semibold : .regular))
+            }.foregroundStyle(rootTab == tab ? ink : secondaryInk).frame(maxWidth: .infinity, minHeight: 48)
+        }.buttonStyle(.plain).accessibilityAddTraits(rootTab == tab ? .isSelected : [])
+    }
+    private func openAddRecipe() {
+        CrumbHaptics.tap()
+        rootTab = 0
+        if editable { adding = true }
+        else if PlanPolicy.isOwned(cloud.resolved(selectedBook), viewer: account.session?.userID) { paywall = true }
+        else { failure = AppLanguage.text("この操作にはブック所有者の有効なPlusが必要です。") }
+    }
+    private var menuPage: some View {
+        NavigationStack(path: $path) {
             VStack(spacing: 0) {
                 HStack(spacing: 10) {
-                    NavigationLink { ProfileView() } label: {
+                    NavigationLink(value: AlbumRoute.profile) {
                         ProfileAvatar(size: 44)
                     }.accessibilityLabel("プロフィールを開く")
                     VStack(alignment: .leading, spacing: 4) {
                         Menu {
                             ForEach(books) { book in
-                                Button {
+                                Button { CrumbHaptics.tap();
                                     selectedBookID = book.id
                                     selectedCategory = nil
                                     query = ""
@@ -65,9 +132,9 @@ struct AlbumView: View {
                                 }
                             }
                             Divider()
-                            Button("メニューブックを追加", systemImage: "plus") {
+                            Button("メニューブックを追加", systemImage: "plus") { CrumbHaptics.tap();
                                 newBookName = ""
-                                addingBook = true
+                                if plus.hasPlus { addingBook = true } else { paywall = true }
                             }
                         } label: {
                             HStack(spacing: 8) {
@@ -76,10 +143,10 @@ struct AlbumView: View {
                                     .lineLimit(1).minimumScaleFactor(0.75)
                                 Image(systemName: "chevron.down").font(.subheadline.weight(.semibold))
                             }
-                        }.accessibilityLabel("メニューブックを切り替え")
+                        }.hapticActivation().accessibilityLabel("メニューブックを切り替え")
                     }
                     Spacer(minLength: 0)
-                    Button {
+                    Button { CrumbHaptics.tap();
                         showingSearch.toggle()
                         searchFocused = showingSearch
                         if !showingSearch { query = "" }
@@ -89,53 +156,81 @@ struct AlbumView: View {
                             .frame(width: 44, height: 44)
                     }.accessibilityLabel("レシピを検索")
                         .accessibilityValue(showingSearch ? Text("検索中") : Text(""))
-                    Button { adding = true } label: {
-                        Image(systemName: "plus").font(.headline)
-                            .foregroundStyle(.white).frame(width: 44, height: 44).background(ink, in: .circle)
-                    }.accessibilityLabel("レシピを追加")
+
                 }.padding(20)
                 if showingSearch {
-                    HStack(spacing: 8) {
-                        TextField("", text: $query, prompt:
-                            Text("レシピを検索").foregroundColor(placeholderInk))
-                            .font(.system(size: 16)).foregroundStyle(ink)
-                            .accessibilityLabel("レシピを検索")
-                            .focused($searchFocused)
-                            .submitLabel(.search).onSubmit { searchFocused = false }
-                        if !query.isEmpty {
-                            Button { query = ""; searchFocused = true } label: {
-                                Image(systemName: "xmark.circle.fill").foregroundStyle(secondaryInk)
-                            }.accessibilityLabel("検索をクリア")
+                    HStack(spacing: 10) {
+                        HStack(spacing: 8) {
+                            TextField("", text: $query, prompt:
+                                Text("レシピを検索").foregroundColor(placeholderInk))
+                                .font(.system(size: 16)).foregroundStyle(ink)
+                                .accessibilityLabel("レシピを検索")
+                                .focused($searchFocused)
+                                .submitLabel(.search).onSubmit { searchFocused = false }
+                            if !query.isEmpty {
+                                Button { CrumbHaptics.tap(); query = ""; searchFocused = true } label: {
+                                    Image(systemName: "xmark.circle.fill").foregroundStyle(secondaryInk)
+                                }.accessibilityLabel("検索をクリア")
+                            }
                         }
+                        .padding(14).background(.white, in: .rect(cornerRadius: 14))
+                        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(fieldBorder))
+                        Button("キャンセル") { CrumbHaptics.tap();
+                            query = ""
+                            searchFocused = false
+                            showingSearch = false
+                        }
+                        .font(.system(size: 16))
+                        .foregroundStyle(ink)
+                        .fixedSize()
+                        .frame(minHeight: 44)
                     }
-                    .padding(14).background(.white, in: .rect(cornerRadius: 14))
-                    .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(fieldBorder))
                     .padding(.horizontal, 20).padding(.bottom, 12)
                 }
                 categoryFilters
+                if !editable {
+                    Label("閲覧のみ・レシピの書き出しはブック管理からできます。", systemImage: "lock")
+                        .font(.caption).foregroundStyle(secondaryInk).padding(.horizontal, 20).padding(.bottom, 8)
+                }
                 if recipes.isEmpty {
-                    ContentUnavailableView(
-                        LocalizedStringKey(query.isEmpty && selectedCategory == nil ? "レシピを残してみよう" : "レシピが見つかりません"),
-                        systemImage: "book.closed",
-                        description: Text(LocalizedStringKey(query.isEmpty && selectedCategory == nil ? "＋から料理の写真、材料、作り方を記録できます。" : "別の料理名やカテゴリで検索してください。")))
+                    if query.isEmpty && selectedCategory == nil {
+                        EmptyRecipeView(onAdd: editable ? { CrumbHaptics.add(); adding = true } : nil)
+                    } else {
+                        ContentUnavailableView("レシピが見つかりません", systemImage: "magnifyingglass",
+                                               description: Text("別の料理名やカテゴリで検索してください。"))
+                    }
                 } else {
                     ScrollView {
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 15),
                                                  count: dynamicType.isAccessibilitySize ? 2 : 3), spacing: 24) {
                             ForEach(recipes) { meal in
-                                NavigationLink { MealDetail(meal: meal) } label: { AlbumTile(meal: meal) }
+                                NavigationLink(value: AlbumRoute.recipe(meal.id)) { AlbumTile(meal: meal) }
                                     .buttonStyle(.plain)
                             }
                         }.padding(20)
                     }
                 }
-            }.background { AlbumPaper().ignoresSafeArea() }
+            }
+            .navigationDestination(for: AlbumRoute.self) { route in
+                switch route {
+                case .profile: ProfileView()
+                case .books: MenuBookManager()
+                case .recipe(let id):
+                    if let meal = meals.first(where: { $0.id == id }) { MealDetail(meal: meal, canEdit: editable) }
+                }
+            }
+            .onChange(of: path) { _, _ in CrumbHaptics.tap() }
+            .background { AlbumPaper().ignoresSafeArea() }
                 .foregroundStyle(ink).toolbar(.hidden, for: .navigationBar)
+                .sheet(isPresented: $paywall) { PlusView() }
+                .alert("操作を完了できませんでした", isPresented: Binding(get: { failure != nil }, set: { if !$0 { failure = nil } })) {
+                    Button("閉じる", role: .cancel) { CrumbHaptics.tap() }
+                } message: { Text(failure ?? "") }
                 .alert("メニューブックを追加", isPresented: $addingBook) {
                     TextField("メニューブック名", text: $newBookName)
-                    Button("追加", action: createBook)
+                    Button("追加", action: CrumbHaptics.action(createBook))
                         .disabled(newBookName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    Button("キャンセル", role: .cancel) { newBookName = "" }
+                    Button("キャンセル", role: .cancel) { CrumbHaptics.tap(); newBookName = "" }
                 }
                 .onChange(of: selectedBookID) { _, _ in
                     selectedCategory = nil
@@ -144,21 +239,42 @@ struct AlbumView: View {
                 .fullScreenCover(isPresented: $adding) {
                     RecipeCreationFlow(bookID: selectedBook.id)
                 }
+                .sheet(item: $importDraft) { draft in
+                    MealEditor(meal: nil, initialBookID: selectedBook.id, draft: draft)
+                }
+                .onAppear { receiveImport() }
+                .onChange(of: scenePhase) { _, phase in if phase == .active { receiveImport() } }
+                .onChange(of: routes.recipeSource) { _, _ in receiveImport() }
+                .onChange(of: adding) { _, active in if !active { receiveImport() } }
+                .onChange(of: path) { _, value in if value.isEmpty { receiveImport() } }
         }
+    }
+    private func receiveImport() {
+        guard importDraft == nil, !adding, path.isEmpty else { return }
+        if let source = routes.recipeSource {
+            routes.recipeSource = nil
+            openImport(source)
+        } else if let source = RecipeInbox.take() { openImport(source) }
+    }
+    private func openImport(_ source: String) {
+        var recipe = MealRecipe(); recipe.servingsKnown = false
+        importDraft = RecipeDraft(title: "", recipe: recipe, source: source)
     }
     private func createBook() {
         let name = newBookName.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !name.isEmpty else { return }
-        if let existing = books.first(where: { RecipeCategories.matches($0.name, name) }) {
-            selectedBookID = existing.id
-        } else {
-            let book = MenuBook(id: UUID().uuidString, name: name)
-            storedBooks = MenuBook.encode(books + [book])
-            selectedBookID = book.id
+        guard plus.hasPlus, !name.isEmpty, !creating else { return }
+        creating = true
+        Task {
+            defer { creating = false }
+            do {
+                let book: MenuBook
+                if plus.localTesting {
+                    book = MenuBook(id: UUID().uuidString, name: name)
+                    storedBooks = MenuBook.encode(books + [book])
+                } else { book = try await cloud.createBook(name) }
+                selectedBookID = book.id; selectedCategory = nil; query = ""; newBookName = ""
+            } catch { failure = AppLanguage.errorMessage(error) }
         }
-        selectedCategory = nil
-        query = ""
-        newBookName = ""
     }
 
     private var categoryFilters: some View {
@@ -179,14 +295,22 @@ struct AlbumView: View {
 
     private func categoryFilter(_ category: String?) -> some View {
         let selected = selectedCategory == category
-        return Button { selectedCategory = category } label: {
-            Text(verbatim: category ?? "All")
+        return Button { CrumbHaptics.tap(); selectedCategory = category } label: {
+            Text(verbatim: category ?? AppLanguage.text("All"))
                 .font(.subheadline.weight(.medium))
                 .padding(.horizontal, 16).padding(.vertical, 10)
                 .foregroundStyle(selected ? .white : ink)
                 .background(selected ? ink : .white, in: .capsule)
                 .overlay(Capsule().strokeBorder(ink.opacity(selected ? 0 : 0.12)))
         }.buttonStyle(.plain).accessibilityAddTraits(selected ? .isSelected : [])
+        .categoryActions(category, enabled: editable, canEdit: { id in
+            guard let book = books.first(where: { $0.id == id }) else { return false }
+            return PlanPolicy.canEdit(book: cloud.resolved(book), viewer: account.session?.userID, plus: plus.hasPlus)
+        }) { old, replacement in
+            if let selectedCategory, RecipeCategories.matches(selectedCategory, old) {
+                self.selectedCategory = replacement
+            }
+        }
     }
 
 }
@@ -204,6 +328,7 @@ struct AlbumTile: View {
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
                 .padding(.top, 3)
+            if MealRecipe(contents: meal.structuredRecipe).isMeal { Label("Meal", systemImage: "square.stack").font(.caption).foregroundStyle(secondaryInk) }
             if let date = meal.recordedDate {
                 Text(dayLabel(date))
                 .font(.system(size: 12))
@@ -235,12 +360,17 @@ struct AlbumPaper: View {
 }
 
 enum AppLanguage {
-    static var defaultCode: String {
-        let code = Locale.preferredLanguages.first?.prefix(2).description ?? "en"
-        return ["ja", "en", "ko"].contains(code) ? code : "en"
-    }
+    static var defaultCode: String { "en" }
     static var code: String { UserDefaults.standard.string(forKey: "appLanguage") ?? defaultCode }
     static var locale: Locale { Locale(identifier: code) }
+    static func format(_ key: String, _ arguments: CVarArg...) -> String {
+        String(format: text(key), locale: locale, arguments: arguments)
+    }
+    static func errorMessage(_ error: Error) -> String {
+        if let known = error as? CloudError { return known.localizedDescription }
+        if let known = error as? AccountError { return known.localizedDescription }
+        return text("操作を完了できませんでした。もう一度お試しください。")
+    }
     static func text(_ key: String) -> String {
         guard let path = Bundle.main.path(forResource: code, ofType: "lproj"), let bundle = Bundle(path: path) else { return key }
         return bundle.localizedString(forKey: key, value: key, table: nil)
@@ -260,12 +390,12 @@ struct LanguageSettings: View {
             }
             .navigationTitle("設定").navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) { Button("完了") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) { Button("完了") { CrumbHaptics.tap(); dismiss() } }
             }
         }
     }
     private func languageRow(_ title: String, code: String) -> some View {
-        Button { language = code } label: {
+        Button { CrumbHaptics.tap(); language = code } label: {
             HStack {
                 Text(verbatim: title).foregroundStyle(ink)
                 Spacer()

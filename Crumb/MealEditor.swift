@@ -4,7 +4,18 @@ import Photos
 import SwiftData
 import ImageIO
 
+enum MealEditorLayout {
+    static let sectionSpacing: CGFloat = 24
+}
+
 struct MealEditor: View {
+    @EnvironmentObject private var plus: PlusStore
+    @EnvironmentObject private var cloud: CloudLibrary
+    @EnvironmentObject private var account: AccountStore
+    private func editable(_ id: String) -> Bool {
+        guard let book = MenuBook.decode(storedBooks).first(where: { $0.id == id }) else { return false }
+        return PlanPolicy.canEdit(book: cloud.resolved(book), viewer: account.session?.userID, plus: plus.hasPlus)
+    }
     let meal: Meal?
     private let initialDate: Date?
     private let onSaved: ((Meal) -> Void)?
@@ -15,6 +26,13 @@ struct MealEditor: View {
     @State private var originalPhoto: Data?
     @State private var cropSource: Data?
     @State private var showingCrop = false
+    @State private var showRecipe = false
+    @State private var recipeSection = 0
+    @State private var captureMode: RecipeCapture.Mode?
+    @State private var pendingImport: RecipeDraft?
+    @State private var confirmingImport = false
+    @State private var useAICover = false
+    private let draft: RecipeDraft?
     @State private var styling = false
     @State private var selectedPlateID: String?
     @State private var photoFraming: String?
@@ -22,8 +40,6 @@ struct MealEditor: View {
     @State private var includesDate: Bool
     @State private var structured: MealRecipe
     @State private var includesRecipe: Bool
-    @State private var showRecipe = false
-    @State private var recipeSection = 0
     @State private var name: String
     @State private var note: String
     @State private var recipe: String
@@ -38,11 +54,16 @@ struct MealEditor: View {
     @AppStorage("menuBooks") private var storedBooks = "[]"
     @State private var newCategory = ""
     @State private var addingCategory = false
+    @FocusState private var editorFocus: RecipeEditorField?
+    @State private var keyboardVisible = false
+    @State private var focusScrollRevision = 0
+    private var categoryFocused: Bool { editorFocus == .category }
     @AppStorage("recipeCategories") private var storedCategories = "[]"
 
 
-    init(meal: Meal?, initialDate: Date? = nil, initialPhoto: Data? = nil, initialBookID: String = MenuBook.defaultID, onSaved: ((Meal) -> Void)? = nil) {
+    init(meal: Meal?, initialDate: Date? = nil, initialPhoto: Data? = nil, initialBookID: String = MenuBook.defaultID, draft: RecipeDraft? = nil, onSaved: ((Meal) -> Void)? = nil) {
         self.meal = meal
+        self.draft = draft
         self.initialDate = initialDate
         self.onSaved = onSaved
         _photo = State(initialValue: meal?.photo ?? initialPhoto)
@@ -51,95 +72,131 @@ struct MealEditor: View {
         _photoFraming = State(initialValue: meal?.photoFraming)
         _date = State(initialValue: meal?.date ?? initialDate ?? .now)
         _includesDate = State(initialValue: meal == nil || meal?.recordedDate != nil || initialDate != nil)
-        let existingRecipe = MealRecipe(contents: meal?.structuredRecipe)
+        let existingRecipe = draft?.recipe ?? MealRecipe(contents: meal?.structuredRecipe)
         _structured = State(initialValue: existingRecipe)
         _includesRecipe = State(initialValue: true)
         _categories = State(initialValue: meal?.categories ?? [])
         _menuBookID = State(initialValue: meal?.menuBookID ?? initialBookID)
-        _name = State(initialValue: meal?.name ?? "")
-        _note = State(initialValue: meal?.note ?? "")
+        _name = State(initialValue: draft?.title ?? meal?.name ?? "")
+        _note = State(initialValue: draft?.notes ?? meal?.note ?? "")
         _recipe = State(initialValue: meal?.recipe ?? "")
-        _recipeURL = State(initialValue: meal?.recipeURL ?? "")
+        _recipeURL = State(initialValue: draft?.source ?? meal?.recipeURL ?? "")
         _place = State(initialValue: meal?.place)
     }
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
-                    photoHero
-                    if originalPhoto != nil {
-                        Button {
-                            showingCrop = true
-                        } label: {
-                            Label("トリミング", systemImage: "crop")
-                                .font(.subheadline.weight(.medium))
-                                .frame(minHeight: 44)
+            ScrollViewReader { editorScroll in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: MealEditorLayout.sectionSpacing) {
+                        photoHero
+                        if originalPhoto != nil {
+                            Button {
+                                CrumbHaptics.tap(); showingCrop = true
+                            } label: {
+                                Label("トリミング", systemImage: "crop")
+                                    .font(.subheadline.weight(.medium)).frame(minHeight: 44)
+                            }.frame(maxWidth: .infinity)
+                                .disabled(loading || syncing || styling)
                         }
-                        .frame(maxWidth: .infinity)
-                        .disabled(loading || syncing || styling)
-                    }
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("料理名").font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
-                        TextField("料理名（任意）", text: $name)
-                            .padding(15)
-                            .background(ink.opacity(0.025), in: .rect(cornerRadius: 12))
-                            .overlay { RoundedRectangle(cornerRadius: 12).strokeBorder(ink.opacity(0.13)) }
-                    }
-                    editorSection("ひとこと") {
-                        TextField("メモを追加（任意）", text: $note, axis: .vertical)
-                    }
-                    editorSection("メニューブック") {
-                        Picker("保存先", selection: $menuBookID) {
-                            ForEach(MenuBook.decode(storedBooks)) { book in
-                                Text(verbatim: book.name).tag(book.id)
+                        if let preview = draft?.previewData, let image = UIImage(data: preview) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Image(uiImage: image).resizable().scaledToFit().frame(height: 160).clipShape(.rect(cornerRadius: 14))
+                                Text("AI preview").font(.caption).foregroundStyle(secondaryInk)
+                                Toggle("Use as cover", isOn: $useAICover)
+                                    .onChange(of: useAICover) { _, use in
+                                        photo = use ? preview : initialDraftPhoto
+                                        originalPhoto = photo
+                                    }
                             }
-                        }.pickerStyle(.menu)
-                    }
-                    categoryEditor
-                    if let originalPhoto {
-                        PhotoPlating(original: originalPhoto, photo: $photo, working: $styling, plateID: $selectedPlateID, framing: $photoFraming)
-                            .id(originalPhoto)
-                            .disabled(loading || syncing)
-                    }
-                    editorSection("日付") {
-                        Toggle("日付を記録", isOn: $includesDate)
-                        if includesDate {
-                            DatePicker("食事の日", selection: $date, displayedComponents: .date)
                         }
-                    }
-                    editorSection("レシピ") {
-                        if includesRecipe {
-                            Button { showRecipe = true } label: {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("料理名").font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
+                            TextField("料理名（任意）", text: $name)
+                                .focused($editorFocus, equals: .dishName)
+                                .id(RecipeEditorField.dishName)
+                                .padding(15)
+                                .background(ink.opacity(0.025), in: .rect(cornerRadius: 12))
+                                .overlay { RoundedRectangle(cornerRadius: 12).strokeBorder(ink.opacity(0.13)) }
+                        }
+                        editorSection("ひとこと") {
+                            TextField("メモを追加（任意）", text: $note, axis: .vertical)
+                                .lineLimit(1...5).focused($editorFocus, equals: .note)
+                                .id(RecipeEditorField.note)
+                        }
+                        categoryEditor.id(RecipeEditorField.category)
+                        if let originalPhoto {
+                            PhotoPlating(original: originalPhoto, photo: $photo, working: $styling, plateID: $selectedPlateID, framing: $photoFraming)
+                                .id(originalPhoto)
+                                .disabled(loading || syncing)
+                        }
+                        editorSection("日付") {
+                            HStack(spacing: 10) {
+                                Text("日付を記録")
+                                if includesDate { DatePicker("日付", selection: $date, displayedComponents: .date).labelsHidden().datePickerStyle(.compact).fixedSize() }
+                                Spacer(minLength: 0)
+                                Toggle("日付を記録", isOn: $includesDate).labelsHidden().fixedSize()
+                            }
+                        }
+                        editorSection("レシピ") {
+                            Button { CrumbHaptics.tap(); showRecipe = true } label: {
                                 HStack {
                                     Text("材料と作り方を編集")
                                     Spacer()
                                     Image(systemName: "chevron.right").font(.caption)
                                 }
+                            }.buttonStyle(.plain)
+                        }
+                        if !recipeURL.isEmpty {
+                            editorSection("Source") {
+                                TextField("https://", text: $recipeURL).keyboardType(.URL).textInputAutocapitalization(.never)
+                                    .focused($editorFocus, equals: .source)
+                                    .id(RecipeEditorField.source)
                             }
-                            .buttonStyle(.plain)
+                        }
+                        if let origin = draft?.originRecipeID ?? structured.originRecipeID,
+                           let original = allMeals.first(where: { $0.id == origin }) {
+                            Text("Adapted from \(original.title)").font(.footnote).foregroundStyle(secondaryInk)
                         }
                     }
+                    .padding(.horizontal, 22).padding(.vertical, 18)
+
                 }
-                .padding(.horizontal, 22).padding(.vertical, 18)
+                .scrollDismissesKeyboard(.interactively)
+                .onChange(of: editorFocus) { _, _ in focusScrollRevision += 1 }
+                .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { notification in
+                    updateKeyboard(notification)
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardDidChangeFrameNotification)) { notification in
+                    updateKeyboard(notification)
+                }
+                .task(id: focusScrollRevision) {
+                    guard let target = editorFocus else { return }
+                    switch target { case .name, .amount, .unit, .step: return; default: break }
+                    // A keyboard resize and a row insertion can occur in the same update.
+                    // Scroll after layout, and repeat when the final keyboard frame arrives.
+                    do { try await Task.sleep(for: .milliseconds(80)) } catch { return }
+                    guard !Task.isCancelled, editorFocus == target else { return }
+                    editorScroll.scrollTo(target, anchor: .center)
+                }
             }
-            .scrollDismissesKeyboard(.interactively)
+
             .background(paper.ignoresSafeArea())
             .navigationTitle(LocalizedStringKey(meal == nil ? "レシピを追加" : "レシピを編集"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button { dismiss() } label: {
+                    Button { CrumbHaptics.tap(); dismiss() } label: {
                         Image(systemName: "xmark")
                     }
                     .accessibilityLabel("キャンセル")
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("レシピを保存", systemImage: "checkmark", action: save)
+                    Button(draft?.originRecipeID != nil ? "Save as new recipe" : "Save recipe", systemImage: "checkmark", action: CrumbHaptics.action(save))
                         .font(.system(.body).weight(.semibold))
-                    .disabled(photo == nil || loading || syncing || styling)
-                    .accessibilityLabel("レシピを保存")
+                    .disabled(loading || syncing || styling)
+                    .accessibilityLabel(draft?.originRecipeID != nil ? "Save as new recipe" : "Save recipe")
+                    .keyboardShortcut("s", modifiers: .command)
                 }
             }
             .navigationDestination(isPresented: $showRecipe) {
@@ -174,6 +231,21 @@ struct MealEditor: View {
                     }
                 }
             }
+            .sheet(item: $captureMode, onDismiss: {
+                if pendingImport != nil {
+                    if structured.cleaned.isEmpty && name.isEmpty && note.isEmpty && recipe.isEmpty { applyImport(replacing: true) }
+                    else { confirmingImport = true }
+                }
+            }) { mode in
+                RecipeCapture(mode: mode, initialURL: mode == .link ? recipeURL : "") { imported in
+                    pendingImport = imported
+                }
+            }
+            .confirmationDialog("Apply imported recipe?", isPresented: $confirmingImport, titleVisibility: .visible) {
+                Button("Replace recipe fields") { applyImport(replacing: true) }
+                Button("Add to existing recipe") { applyImport(replacing: false) }
+                Button("Cancel", role: .cancel) { pendingImport = nil }
+            } message: { Text("Your current recipe stays unchanged until you choose. Photos and styling are kept.") }
             .sheet(isPresented: $showingCrop) {
                 if let data = originalPhoto ?? cropSource {
                     if let frame = PhotoFrame.decode(photoFraming),
@@ -196,55 +268,128 @@ struct MealEditor: View {
                 }
             }
             .task(id: item) { await loadPhoto(item) }
+            .task {
+                if draft?.source != nil && draft?.recipe.isEmpty == true { captureMode = .link }
+            }
             .alert(AppLanguage.text(error ?? ""), isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
-                Button("閉じる", role: .cancel) {}
+                Button("閉じる", role: .cancel) { CrumbHaptics.tap() }
             }
         }
     }
 
+    private func updateKeyboard(_ notification: Notification) {
+        guard let frame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
+        keyboardVisible = frame.height > 0 && frame.minY < UIScreen.main.bounds.height
+        if keyboardVisible, editorFocus != nil { focusScrollRevision += 1 }
+    }
+
+    private var initialDraftPhoto: Data? { meal?.photo }
+
+    private func applyImport(replacing: Bool) {
+        guard let imported = pendingImport else { return }
+        if replacing {
+            structured = imported.recipe
+            if !imported.title.isEmpty { name = imported.title }
+            if !imported.notes.isEmpty { note = imported.notes }
+        } else {
+            let wasEmpty = structured.cleaned.isEmpty
+            structured = structured.cleaned
+            if wasEmpty { structured.servings = imported.recipe.servings; structured.servingsKnown = imported.recipe.servingsKnown }
+            structured.ingredients.append(contentsOf: imported.recipe.ingredients)
+            let oldCount = structured.steps.count
+            structured.steps.append(contentsOf: imported.recipe.steps)
+            var refs = structured.stepIngredients ?? []
+            while refs.count < oldCount { refs.append([]) }
+            refs.append(contentsOf: imported.recipe.stepIngredients ?? Array(repeating: [], count: imported.recipe.steps.count))
+            structured.stepIngredients = refs
+            if name.isEmpty { name = imported.title }
+            note = [note, imported.notes].filter { !$0.isEmpty }.joined(separator: "\n\n")
+        }
+        if let source = imported.source { recipeURL = source }
+        pendingImport = nil
+    }
     private var availableCategories: [String] {
         RecipeCategories.normalized(RecipeCategories.decode(storedCategories) + allMeals.filter { $0.wantToVisit != true }.flatMap(\.categories) + categories)
             .sorted { $0.localizedStandardCompare($1) == .orderedAscending }
     }
 
     private var categoryEditor: some View {
-        editorSection("カテゴリ") {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    editorCategoryChip(nil)
-                    Button {
-                        newCategory = ""
-                        addingCategory = true
-                    } label: {
-                        Image(systemName: "plus").font(.subheadline.weight(.medium))
-                            .frame(width: 44, height: 40)
-                            .background(ink.opacity(0.06), in: .capsule)
-                    }.buttonStyle(.plain).accessibilityLabel("カテゴリを追加")
-                    ForEach(availableCategories, id: \.self) { category in
-                        editorCategoryChip(category)
+        editorSection("カテゴリ", framed: false) {
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        editorCategoryChip(nil)
+                        ForEach(availableCategories, id: \.self) { category in
+                            editorCategoryChip(category)
+                        }
+                        Group {
+                            if addingCategory {
+                                HStack(spacing: 0) {
+                                    TextField("カテゴリ名", text: $newCategory)
+                                        .font(.subheadline)
+                                        .frame(width: 120)
+                                        .padding(.leading, 14)
+                                        .focused($editorFocus, equals: .category)
+                                        .submitLabel(.done)
+                                        .onSubmit(addCategory)
+                                        .accessibilityLabel("カテゴリ名")
+                                    Button(action: CrumbHaptics.action(addCategory)) {
+                                        Image(systemName: "checkmark").font(.subheadline.weight(.semibold))
+                                            .frame(width: 44, height: 44)
+                                    }
+                                    .buttonStyle(.plain).accessibilityLabel("カテゴリを追加")
+                                    .disabled(newCategory.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                                    Button(action: CrumbHaptics.action(cancelCategory)) {
+                                        Image(systemName: "xmark").font(.caption.weight(.medium))
+                                            .foregroundStyle(secondaryInk).frame(width: 44, height: 44)
+                                    }.buttonStyle(.plain).accessibilityLabel("キャンセル")
+                                }
+                                .background(ink.opacity(0.06), in: .capsule)
+                                .task { await Task.yield(); editorFocus = .category }
+                            } else {
+                                Button { CrumbHaptics.tap();
+                                    newCategory = ""
+                                    addingCategory = true
+                                } label: {
+                                    Image(systemName: "plus").font(.subheadline.weight(.medium))
+                                        .frame(width: 44, height: 44)
+                                        .background(ink.opacity(0.06), in: .capsule)
+                                }.buttonStyle(.plain).accessibilityLabel("カテゴリを追加")
+                            }
+                        }.id("category-composer")
                     }
+                }
+                .onChange(of: addingCategory) { _, active in
+                    if active { withAnimation(.easeOut(duration: 0.2)) { proxy.scrollTo("category-composer", anchor: .trailing) } }
+                }
+                .onChange(of: availableCategories) { _, _ in
+                    withAnimation(.easeOut(duration: 0.2)) { proxy.scrollTo("category-composer", anchor: .trailing) }
                 }
             }
         }
-        .alert("カテゴリを追加", isPresented: $addingCategory) {
-            TextField("カテゴリ名", text: $newCategory)
-            Button("追加", action: addCategory)
-                .disabled(newCategory.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            Button("キャンセル", role: .cancel) { newCategory = "" }
-        }
+    }
+
+    private func cancelCategory() {
+        if editorFocus == .category { editorFocus = nil }
+        addingCategory = false
+        newCategory = ""
     }
 
     private func editorCategoryChip(_ category: String?) -> some View {
         let selected = category.map { name in categories.contains { RecipeCategories.matches($0, name) } } ?? categories.isEmpty
-        return Button {
+        return Button { CrumbHaptics.tap();
             categories = category.map { [$0] } ?? []
+            cancelCategory()
         } label: {
-            Text(verbatim: category ?? "All")
+            Text(verbatim: category ?? AppLanguage.text("All"))
                 .font(.subheadline.weight(.medium))
                 .padding(.horizontal, 14).padding(.vertical, 10)
                 .foregroundStyle(selected ? .white : ink)
                 .background(selected ? ink : ink.opacity(0.06), in: .capsule)
         }.buttonStyle(.plain).accessibilityAddTraits(selected ? .isSelected : [])
+        .categoryActions(category, enabled: editable(menuBookID), canEdit: editable) { old, replacement in
+            categories = RecipeCategories.replacing(old, with: replacement, in: categories)
+        }
     }
 
     private func addCategory() {
@@ -253,7 +398,7 @@ struct MealEditor: View {
         let existing = availableCategories.first { RecipeCategories.matches($0, clean) } ?? clean
         categories = [existing]
         storedCategories = RecipeCategories.encode(availableCategories + [existing])
-        newCategory = ""
+        cancelCategory()
     }
 
     private var servingsPicker: some View {
@@ -279,7 +424,7 @@ struct MealEditor: View {
         }.scrollDismissesKeyboard(.interactively)
     }
 
-    private func editorSection<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+    private func editorSection<Content: View>(_ title: LocalizedStringKey, framed: Bool = true, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.subheadline.weight(.semibold))
@@ -287,9 +432,11 @@ struct MealEditor: View {
                 .accessibilityAddTraits(.isHeader)
             VStack(alignment: .leading, spacing: 14, content: content)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(14)
-                .background(.white, in: .rect(cornerRadius: 12))
-                .overlay { RoundedRectangle(cornerRadius: 12).strokeBorder(ink.opacity(0.10)) }
+                .padding(framed ? 14 : 0)
+                .background(framed ? Color.white : Color.clear, in: .rect(cornerRadius: 12))
+                .overlay {
+                    if framed { RoundedRectangle(cornerRadius: 12).strokeBorder(ink.opacity(0.10)) }
+                }
         }
     }
 
@@ -313,15 +460,23 @@ struct MealEditor: View {
                     .frame(width: 44, height: 44)
                     .background(.white, in: Circle())
                     .overlay { Circle().strokeBorder(ink.opacity(0.09)) }
-            }
+            }.hapticActivation()
             .disabled(loading || syncing || styling)
-            .accessibilityLabel(photo == nil ? "写真を選ぶ" : "写真を変更")
+            .accessibilityLabel(Text(LocalizedStringKey(photo == nil ? "写真を選ぶ" : "写真を変更")))
         }
         .frame(maxWidth: .infinity)
     }
 
     private func save() {
-        guard let photo, !syncing, !styling else { return }
+        guard editable(menuBookID), meal.map({ editable($0.menuBookID ?? MenuBook.defaultID) }) ?? true else {
+            error = "この操作にはブック所有者の有効なPlusが必要です。"; return
+        }
+        guard !syncing, !styling else { return }
+        guard !structured.ingredients.contains(where: { $0.rawAmount?.isEmpty == false && RecipeQuantity.parse($0.rawAmount!) == nil }) else {
+            error = "Enter a valid amount or fraction."; return
+        }
+        guard let photo = photo ?? UIImage(named: "CrumbAvatar")?.pngData() else { return }
+        if addingCategory && !newCategory.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { addCategory() }
         let record = meal ?? Meal(photo: photo, name: name, date: date, place: nil)
         if meal == nil { context.insert(record) }
         record.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -337,10 +492,15 @@ struct MealEditor: View {
         let cleanURL = includesRecipe ? recipeURL.trimmingCharacters(in: .whitespacesAndNewlines) : ""
         let recipeNote = includesRecipe ? recipe : ""
         var cleanRecipe = structured
+        for ingredient in cleanRecipe.ingredients where ingredient.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            cleanRecipe.removeIngredient(ingredient.id)
+        }
         cleanRecipe.steps = cleanRecipe.steps.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
         for index in cleanRecipe.steps.indices.reversed() where cleanRecipe.steps[index].isEmpty {
             cleanRecipe.removeStep(at: index)
         }
+        cleanRecipe.originRecipeID = draft?.originRecipeID ?? cleanRecipe.originRecipeID
+        cleanRecipe.coverIsAI = useAICover || (draft == nil && cleanRecipe.coverIsAI == true && self.photo == meal?.photo)
         let contents = includesRecipe ? cleanRecipe.contents : nil
         if record.recipe != recipeNote || record.recipeURL != cleanURL ||
             MealRecipe(contents: record.structuredRecipe).contents != contents {
@@ -351,6 +511,8 @@ struct MealEditor: View {
         }
         do {
             try context.save()
+            NotificationCenter.default.post(name: .crumbLibraryChanged, object: nil)
+            CrumbHaptics.success()
             onSaved?(record)
             dismiss()
         } catch {

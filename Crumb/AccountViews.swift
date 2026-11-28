@@ -22,7 +22,7 @@ struct AccountRoot: View {
             } else if !passedWelcome && !account.signedIn {
                 AccountWelcome { passedWelcome = true }
             } else if let container {
-                AccountHome()
+                AccountHome(defaults: defaults)
                     .modelContainer(container)
                     .defaultAppStorage(defaults)
                     .id(readyScope)
@@ -35,7 +35,7 @@ struct AccountRoot: View {
             account.credentialsRevoked()
         }
         .alert("記録を開けませんでした", isPresented: $storageFailed) {
-            Button("もう一度試す") { prepareScope() }
+            Button("もう一度試す") { CrumbHaptics.tap(); prepareScope() }
         } message: { Text("記録は削除せずに保持しています。もう一度お試しください。") }
     }
 
@@ -60,6 +60,13 @@ struct AccountRoot: View {
 }
 
 private struct AccountHome: View {
+    let defaults: UserDefaults
+    @Environment(\.modelContext) private var context
+    @Environment(\.scenePhase) private var scenePhase
+    @EnvironmentObject private var invites: InviteRouter
+    @StateObject private var plus = PlusStore()
+    @StateObject private var cloud = CloudLibrary()
+    @State private var joining = false
     @EnvironmentObject private var account: AccountStore
     @AppStorage("profileSetupDone") private var profileDone = false
     @AppStorage("profileName") private var name = ""
@@ -70,14 +77,33 @@ private struct AccountHome: View {
                     ProfileAvatar(size: 88)
                     Text("プロフィールを設定").font(.custom("Nunito-SemiBold", size: 28, relativeTo: .title))
                     TextField("名前", text: $name).textFieldStyle(.roundedBorder).textContentType(.nickname)
-                    Button("はじめる") {
+                    Button("はじめる") { CrumbHaptics.tap();
                         name = name.trimmingCharacters(in: .whitespacesAndNewlines)
                         profileDone = true
                     }.buttonStyle(.borderedProminent).controlSize(.large)
-                    Button("あとで設定する") { profileDone = true }.foregroundStyle(secondaryInk)
+                    Button("あとで設定する") { CrumbHaptics.tap(); profileDone = true }.foregroundStyle(secondaryInk)
                 }.padding(30).foregroundStyle(ink)
             } else { AlbumView() }
         }
+        .environmentObject(plus).environmentObject(cloud)
+        .task {
+            cloud.configure(account: account, context: context, defaults: defaults)
+            await plus.configure(account: account)
+            await cloud.sync()
+            if invites.pending != nil { joining = true }
+        }
+        .task(id: scenePhase) {
+            guard scenePhase == .active else { return }
+            await plus.reconcile()
+            while !Task.isCancelled {
+                await cloud.sync()
+                try? await Task.sleep(for: .seconds(45))
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .crumbLibraryChanged)) { _ in Task { await cloud.sync() } }
+        .onChange(of: plus.hasPlus) { _, _ in Task { await cloud.sync() } }
+        .onChange(of: invites.pending) { _, token in if token != nil { joining = true } }
+        .sheet(isPresented: $joining) { JoinBookView().environmentObject(cloud).environmentObject(plus) }
     }
 }
 
@@ -94,7 +120,7 @@ struct AccountWelcome: View {
                 .multilineTextAlignment(.center).foregroundStyle(secondaryInk)
             Spacer()
             AppleAccountButton()
-            Button("ログインせず使う", action: continueAsGuest)
+            Button("ログインせず使う", action: CrumbHaptics.action(continueAsGuest))
                 .font(.system(.body).weight(.semibold)).frame(minHeight: 44)
             Text("レシピはこの端末に保存されます。")
                 .font(.footnote).foregroundStyle(secondaryInk)
@@ -103,7 +129,7 @@ struct AccountWelcome: View {
         .padding(28).padding(.bottom, 16)
         .foregroundStyle(ink).background(paper.ignoresSafeArea())
         .alert("ログインできませんでした", isPresented: Binding(get: { account.error != nil }, set: { if !$0 { account.error = nil } })) {
-            Button("閉じる", role: .cancel) { account.error = nil }
+            Button("閉じる", role: .cancel) { CrumbHaptics.tap(); account.error = nil }
         } message: { Text(account.error ?? "") }
     }
 }
@@ -122,7 +148,7 @@ struct AppleAccountButton: View {
                 .frame(height: 52).clipShape(.rect(cornerRadius: 14))
                 .disabled(account.busy)
             } else {
-                Button {
+                Button { CrumbHaptics.tap();
                     account.error = AccountError.notConfigured.localizedDescription
                 } label: {
                     Label("Appleで続ける", systemImage: "apple.logo")
@@ -149,11 +175,11 @@ struct AccountSettingsSection: View {
                 Label("Appleでログイン中", systemImage: "checkmark.shield")
                     .font(.system(.body).weight(.semibold))
                 if let email = session.email { Text(email).font(.footnote).foregroundStyle(secondaryInk).textSelection(.enabled) }
-                Button("ログアウト") { confirmSignOut = true }.disabled(account.busy)
-                Button("アカウントを削除", role: .destructive) { confirmDeletion = true }.disabled(account.busy)
+                Button("ログアウト") { CrumbHaptics.tap(); confirmSignOut = true }.disabled(account.busy)
+                Button("アカウントを削除", role: .destructive) { CrumbHaptics.tap(); confirmDeletion = true }.disabled(account.busy)
             } else {
                 Text("ログインせずに利用中").font(.subheadline).foregroundStyle(secondaryInk)
-                Button { signIn = true } label: {
+                Button { CrumbHaptics.tap(); signIn = true } label: {
                     Label("Appleで登録・ログイン", systemImage: "apple.logo")
                         .font(.system(.body).weight(.semibold)).frame(maxWidth: .infinity, minHeight: 44)
                 }.buttonStyle(.bordered)
@@ -166,11 +192,11 @@ struct AccountSettingsSection: View {
         }
         .onChange(of: account.signedIn) { _, signedIn in if signedIn { signIn = false } }
         .confirmationDialog("ログアウトしますか？", isPresented: $confirmSignOut, titleVisibility: .visible) {
-            Button("ログアウト") { Task { await account.signOut() } }
+            Button("ログアウト") { CrumbHaptics.tap(); Task { await account.signOut() } }
         } message: { Text("このアカウントの端末内の記録は、再ログインすると開けます。") }
         .confirmationDialog("アカウントを削除しますか？", isPresented: $confirmDeletion, titleVisibility: .visible) {
-            Button("Appleで本人確認して削除", role: .destructive) { verifyDeletion = true }
-        } message: { Text("このアカウントと関連する記録を削除します。取り消せません。ログインせずに保存した記録は残ります。") }
+            Button("Appleで本人確認して削除", role: .destructive) { CrumbHaptics.tap(); verifyDeletion = true }
+        } message: { Text("このアカウントと所有するブック・写真を削除します。取り消せません。ログインせずに保存した記録は残ります。Appleの購読は別途解約してください。") }
         .sheet(isPresented: $verifyDeletion) {
             VStack(spacing: 24) {
                 Text("アカウントを削除").font(.title2.bold())
@@ -187,13 +213,13 @@ struct AccountSettingsSection: View {
                     }
                 }
                 .signInWithAppleButtonStyle(.black).frame(height: 52).disabled(account.busy)
-                Button("キャンセル") { verifyDeletion = false }.disabled(account.busy)
+                Button("キャンセル") { CrumbHaptics.tap(); verifyDeletion = false }.disabled(account.busy)
                 if account.busy { ProgressView() }
                 if let error = account.error { Text(error).font(.footnote).foregroundStyle(.red) }
             }.padding(28).presentationDetents([.medium])
         }
         .alert("操作を完了できませんでした", isPresented: Binding(get: { account.error != nil && !signIn && !verifyDeletion }, set: { if !$0 { account.error = nil } })) {
-            Button("閉じる", role: .cancel) { account.error = nil }
+            Button("閉じる", role: .cancel) { CrumbHaptics.tap(); account.error = nil }
         } message: { Text(account.error ?? "") }
     }
 }
@@ -233,7 +259,7 @@ struct CrumbOnboarding: View {
                 HStack {
                     Text("crumb").font(crumbFont(28))
                     Spacer()
-                    Button("スキップ", action: onComplete)
+                    Button("スキップ", action: CrumbHaptics.action(onComplete))
                         .font(.system(.subheadline).weight(.medium))
                         .foregroundStyle(secondaryInk).frame(minHeight: 44)
                 }.padding(.horizontal, 24)
@@ -262,7 +288,7 @@ struct CrumbOnboarding: View {
 
                 HStack(spacing: 9) {
                     ForEach(0..<3) { index in
-                        Button { go(to: index) } label: {
+                        Button { CrumbHaptics.tap(); go(to: index) } label: {
                             Capsule().fill(index == page ? ink : fieldBorder)
                                 .frame(width: index == page ? 22 : 7, height: 7)
                                 .frame(minWidth: 32, minHeight: 32)
@@ -271,7 +297,7 @@ struct CrumbOnboarding: View {
                             .accessibilityAddTraits(index == page ? .isSelected : [])
                     }
                 }
-                Button {
+                Button { CrumbHaptics.tap();
                     if page == 2 { onComplete() } else { go(to: page + 1) }
                 } label: {
                     HStack {

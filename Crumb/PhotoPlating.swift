@@ -30,12 +30,10 @@ struct PhotoPlating: View {
         let restored = Mode(rawValue: saved?.shape ?? "") ?? .original
         _mode = State(initialValue: restored == .plate ? .original : restored)
         _removeBackground = State(initialValue: restored == .outline)
-        _rim = State(initialValue: Rim(rawValue: saved?.rim ?? "") ?? .none)
     }
     @State private var applyingPlate = false
     @State private var showingPlatePicker = false
     @State private var mode: Mode = .original
-    @State private var rim: Rim = .none
     @State private var removeBackground = false
     @State private var cutout: Data?
     @Query(sort: \HomePlate.addedAt, order: .reverse) private var homePlates: [HomePlate]
@@ -56,27 +54,8 @@ struct PhotoPlating: View {
         var id: Self { self }
     }
 
-    private enum Rim: String, CaseIterable, Identifiable {
-        case none = "なし"
-        case white = "白", black = "黒", cream = "クリーム", pink = "ピンク", blue = "水色", green = "ミント"
-
-        var id: Self { self }
-        var color: UIColor {
-            switch self {
-            case .none: .clear
-            case .white: .white
-            case .black: UIColor(ink)
-            case .cream: UIColor(red: 1, green: 0.91, blue: 0.72, alpha: 1)
-            case .pink: UIColor(red: 1, green: 0.72, blue: 0.79, alpha: 1)
-            case .blue: UIColor(red: 0.65, green: 0.82, blue: 1, alpha: 1)
-            case .green: UIColor(red: 0.68, green: 0.87, blue: 0.76, alpha: 1)
-            }
-        }
-    }
-
     private struct PreviewChoice: Equatable {
         let mode: Mode
-        let rim: Rim
         let plateID: String?
         let removeBackground: Bool
         let framing: String?
@@ -84,7 +63,7 @@ struct PhotoPlating: View {
 
     private var selectedPlate: PlateOption? {
         guard let plateID else { return nil }
-        if let plate = PlateOption.standard.first(where: { $0.id == plateID }) { return plate }
+        if let plate = PlateOption.resolve(plateID) { return plate }
         guard let index = homePlates.firstIndex(where: {
             ($0.identifier?.uuidString ?? "legacy-\($0.persistentModelID)") == plateID
         }) else { return nil }
@@ -92,7 +71,7 @@ struct PhotoPlating: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: MealEditorLayout.sectionSpacing) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("形").font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
                 ScrollView(.horizontal) {
@@ -105,41 +84,15 @@ struct PhotoPlating: View {
                         shapeButton(.scallop, icon: "waveform")
                         shapeButton(.hexagon, icon: "hexagon")
                         shapeButton(.square, icon: "square")
-                        shapeButton(.oval, icon: "oval")
                     }
                 }
                 .scrollIndicators(.hidden)
-            }
-            Group {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("縁").font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
-                    ScrollView(.horizontal) {
-                        HStack(spacing: 8) {
-                            ForEach(Rim.allCases) { option in
-                                Button {
-                                    if rim != option { working = true; rim = option }
-                                } label: {
-                                    Circle().fill(Color(uiColor: option.color))
-                                        .frame(width: 30, height: 30)
-                                        .overlay { Circle().strokeBorder(ink.opacity(0.18)) }
-                                        .overlay { if option == .none { Image(systemName: "nosign").font(.caption).foregroundStyle(.secondary) } }
-                                        .padding(5)
-                                        .overlay { Circle().strokeBorder(rim == option ? ink : .clear, lineWidth: 2) }
-                                }
-                                .buttonStyle(.plain)
-                                .accessibilityLabel(Text(LocalizedStringKey(option.rawValue)))
-                                .accessibilityAddTraits(rim == option ? .isSelected : [])
-                            }
-                        }
-                    }
-                    .scrollIndicators(.hidden)
-                }
             }
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text("お皿").font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
                     Spacer()
-                    Button("もっと見る", systemImage: "chevron.right") {
+                    Button("もっと見る", systemImage: "chevron.right") { CrumbHaptics.tap();
                         showingPlatePicker = true
                     }
                     .font(.subheadline)
@@ -168,7 +121,7 @@ struct PhotoPlating: View {
                 showingPlatePicker = false
             }
         }
-        .task(id: PreviewChoice(mode: mode, rim: rim, plateID: plateID, removeBackground: removeBackground, framing: framing)) { await renderPreview() }
+        .task(id: PreviewChoice(mode: mode, plateID: plateID, removeBackground: removeBackground, framing: framing)) { await renderPreview() }
     }
 
     private var quickPlates: [PlateOption] {
@@ -183,8 +136,9 @@ struct PhotoPlating: View {
 
     private func plateTile(_ plate: PlateOption?) -> some View {
         let selected = plateID == plate?.id
-        return Button {
+        return Button { CrumbHaptics.tap();
             guard !selected else { return }
+            CrumbHaptics.selection()
             plateID = plate?.id
             error = nil
         } label: {
@@ -207,14 +161,14 @@ struct PhotoPlating: View {
             .frame(width: 58)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(plate?.name ?? "なし")
-        .accessibilityLabel(plate?.name ?? "お皿なし")
+        .accessibilityLabel(Text(AppLanguage.text(plate?.name ?? "お皿なし")))
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
     private func shapeButton(_ shape: Mode, icon: String) -> some View {
-        Button {
+        Button { CrumbHaptics.tap();
             guard mode != shape else { return }
+            CrumbHaptics.selection()
             mode = shape
             removeBackground = shape == .outline
             if shape == .original { framing = nil }
@@ -238,7 +192,11 @@ struct PhotoPlating: View {
                                           ? ink : ink.opacity(0.13))
                     }
                 Text(LocalizedStringKey(shape.rawValue)).font(.caption2)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .frame(width: 68, height: 30, alignment: .top)
             }
+            .frame(width: 68, alignment: .top)
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(mode == shape ? .isSelected : [])
@@ -260,18 +218,18 @@ struct PhotoPlating: View {
     }
 
     @MainActor private func shapedImage() async throws -> Data {
-        var frame = PhotoFrame.decode(framing) ?? PhotoFrame(shape: mode.rawValue, rim: rim.rawValue)
-        frame.shape = mode.rawValue; frame.rim = rim.rawValue
+        var frame = PhotoFrame.decode(framing) ?? PhotoFrame(shape: mode.rawValue, rim: "なし")
+        frame.shape = mode.rawValue; frame.rim = "なし"
         frame.backgroundRemoved = mode == .outline
         let image: Data
         if mode == .outline {
             let subject = try await loadSubject()
             try Task.checkCancellation()
-            image = try PlatingImage.compose(subject, rim: rim.color)
+            image = try PlatingImage.compose(subject, rim: .clear)
         } else if mode == .original || mode == .plate {
-            image = rim == .none ? original : try PlatingImage.compose(original, rim: rim.color)
+            image = original
         } else {
-            image = try PlatingImage.crop(original, shape: mode.rawValue, rim: rim.color, frame: frame)
+            image = try PlatingImage.crop(original, shape: mode.rawValue, rim: .clear, frame: frame)
         }
         if framing != frame.encoded { framing = frame.encoded }
         return image
@@ -300,68 +258,79 @@ enum PlatingImage {
     }
 
     static func foreground(from data: Data, subjectPoint: CGPoint?) throws -> Data {
-        guard let photo = thumbnail(data, size: 2000) else { throw CocoaError(.fileReadCorruptFile) }
+        guard let photo = thumbnail(data, size: 2400) else { throw CocoaError(.fileReadCorruptFile) }
+        try Task.checkCancellation()
         let handler = VNImageRequestHandler(cgImage: photo)
         let request = VNGenerateForegroundInstanceMaskRequest()
         try handler.perform([request])
         guard let observation = request.results?.first, !observation.allInstances.isEmpty else {
             throw CocoaError(.fileReadCorruptFile)
         }
-        let instances = try substantialInstances(in: observation, subjectPoint: subjectPoint)
-        let buffer = try observation.generateMaskedImage(ofInstances: instances,
-                                                         from: handler, croppedToInstancesExtent: true)
-        let image = CIImage(cvPixelBuffer: buffer)
-        // Smooth only the alpha edge so the color and texture of the food stay sharp.
-        let alpha = image.applyingFilter("CIColorMatrix", parameters: [
-            "inputRVector": CIVector(x: 0, y: 0, z: 0, w: 1),
-            "inputGVector": CIVector(x: 0, y: 0, z: 0, w: 1),
-            "inputBVector": CIVector(x: 0, y: 0, z: 0, w: 1),
-            "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 0),
-            "inputBiasVector": CIVector(x: 0, y: 0, z: 0, w: 1)
-        ])
-        let edgeMask = alpha.clampedToExtent()
-            .applyingFilter("CIMedianFilter")
-            .applyingGaussianBlur(sigma: 0.7)
-            .cropped(to: image.extent)
-        let foreground = image.applyingFilter("CIBlendWithMask", parameters: [
-            kCIInputMaskImageKey: edgeMask,
-            kCIInputBackgroundImageKey: CIImage(color: .clear).cropped(to: image.extent)
-        ])
-        guard let result = CIContext().createCGImage(foreground, from: image.extent),
+        let instances = try substantialInstances(in: observation, subjectPoint: subjectPoint, primaryOnly: true)
+        let buffer = try observation.generateScaledMaskForImage(forInstances: instances, from: handler)
+        try Task.checkCancellation()
+        let source = CIImage(cgImage: photo)
+        // A matte is coverage, not a photograph: bypass color-space gamma on its gray values.
+        let mask = CIImage(cvPixelBuffer: buffer, options: [.colorSpace: NSNull()]).cropped(to: source.extent)
+        let context = CIContext()
+        let foreground = maskedForeground(source: source, mask: mask)
+        let bounds = try cutoutBounds(mask: mask, context: context)
+        guard let result = context.createCGImage(foreground, from: bounds),
               let png = UIImage(cgImage: result).pngData() else { throw CocoaError(.fileWriteUnknown) }
         return png
     }
 
+    // Apply Vision's high-resolution mask once to original colors. Masking an already masked
+    // image squares its alpha and eats fine edges, chopsticks and pale ceramic rims.
+    static func maskedForeground(source: CIImage, mask: CIImage) -> CIImage {
+        source.applyingFilter("CIBlendWithMask", parameters: [
+            kCIInputMaskImageKey: mask,
+            kCIInputBackgroundImageKey: CIImage(color: .clear).cropped(to: source.extent)
+        ])
+    }
+
+    static func cutoutBounds(mask: CIImage, context: CIContext) throws -> CGRect {
+        guard let image = context.createCGImage(mask, from: mask.extent, format: .L8,
+                                               colorSpace: CGColorSpaceCreateDeviceGray()),
+              let data = image.dataProvider?.data, let bytes = CFDataGetBytePtr(data) else {
+            throw CocoaError(.fileReadCorruptFile)
+        }
+        let width = image.width, height = image.height, stride = image.bytesPerRow
+        var minX = width, minY = height, maxX = -1, maxY = -1
+        for y in 0..<height {
+            for x in 0..<width where bytes[y * stride + x] > 4 {
+                minX = min(minX, x); minY = min(minY, y)
+                maxX = max(maxX, x); maxY = max(maxY, y)
+            }
+        }
+        guard maxX >= minX, maxY >= minY else { throw CocoaError(.fileReadCorruptFile) }
+        return CGRect(x: mask.extent.minX + CGFloat(minX) - 4,
+                      y: mask.extent.minY + CGFloat(height - 1 - maxY) - 4,
+                      width: CGFloat(maxX - minX + 9), height: CGFloat(maxY - minY + 9))
+            .intersection(mask.extent).integral
+    }
+
     static func plateForeground(from data: Data) throws -> Data {
-        guard let original = thumbnail(data, size: 1000) else { throw CocoaError(.fileReadCorruptFile) }
+        guard let original = thumbnail(data, size: 2400) else { throw CocoaError(.fileReadCorruptFile) }
+        try Task.checkCancellation()
         let request = VNGenerateForegroundInstanceMaskRequest()
         let handler = VNImageRequestHandler(cgImage: original)
         try handler.perform([request])
         guard let observation = request.results?.first, !observation.allInstances.isEmpty else {
             throw CocoaError(.fileReadCorruptFile)
         }
-        let instances = try substantialInstances(in: observation, subjectPoint: nil)
-        let buffer = try observation.generateMaskedImage(ofInstances: instances, from: handler,
-                                                         croppedToInstancesExtent: false)
-        let masked = CIImage(cvPixelBuffer: buffer)
-        let ciContext = CIContext()
-        guard let maskImage = ciContext.createCGImage(masked, from: masked.extent) else {
-            throw CocoaError(.fileReadCorruptFile)
-        }
-        let width = original.width
-        let height = original.height
+        let instances = try substantialInstances(in: observation, subjectPoint: nil, primaryOnly: true)
+        let buffer = try observation.generateScaledMaskForImage(forInstances: instances, from: handler)
+        try Task.checkCancellation()
+        let width = original.width, height = original.height
         let bounds = CGRect(x: 0, y: 0, width: width, height: height)
-        var rgba = [UInt8](repeating: 0, count: width * height * 4)
-        let readMask = rgba.withUnsafeMutableBytes { bytes -> Bool in
-            guard let context = CGContext(data: bytes.baseAddress, width: width, height: height,
-                                          bitsPerComponent: 8, bytesPerRow: width * 4,
-                                          space: CGColorSpaceCreateDeviceRGB(),
-                                          bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return false }
-            context.draw(maskImage, in: bounds)
-            return true
+        let ciContext = CIContext()
+        let mask = CIImage(cvPixelBuffer: buffer, options: [.colorSpace: NSNull()]).cropped(to: bounds)
+        var alpha = [UInt8](repeating: 0, count: width * height)
+        alpha.withUnsafeMutableBytes {
+            ciContext.render(mask, toBitmap: $0.baseAddress!, rowBytes: width, bounds: bounds,
+                             format: .L8, colorSpace: nil)
         }
-        guard readMask else { throw CocoaError(.fileReadCorruptFile) }
-        var alpha = stride(from: 3, to: rgba.count, by: 4).map { rgba[$0] }
 
         // Flood-fill transparent pixels connected to the edge to distinguish the table from holes inside the plate.
         var outside = [Bool](repeating: false, count: alpha.count)
@@ -390,7 +359,7 @@ enum PlatingImage {
         for index in alpha.indices where !outside[index] {
             let x = index % width
             let y = index / width
-            if alpha[index] < 72 { alpha[index] = 255 }
+            if alpha[index] == 0 { alpha[index] = 255 }
             minX = min(minX, x)
             minY = min(minY, y)
             maxX = max(maxX, x)
@@ -405,7 +374,7 @@ enum PlatingImage {
                                   intent: .defaultIntent) else { throw CocoaError(.fileReadCorruptFile) }
         let source = CIImage(cgImage: original)
         let cutout = source.applyingFilter("CIBlendWithMask", parameters: [
-            kCIInputMaskImageKey: CIImage(cgImage: matte),
+            kCIInputMaskImageKey: plateEdgeMask(CIImage(cgImage: matte, options: [.colorSpace: NSNull()])),
             kCIInputBackgroundImageKey: CIImage(color: .clear).cropped(to: bounds)
         ])
         let rect = CGRect(x: minX - 2, y: height - 1 - maxY - 2,
@@ -415,7 +384,14 @@ enum PlatingImage {
         return png
     }
 
-    private static func substantialInstances(in observation: VNInstanceMaskObservation, subjectPoint: CGPoint?) throws -> IndexSet {
+    // Subpixel feathering reduces staircase edges without blurring the ceramic texture.
+    static func plateEdgeMask(_ mask: CIImage) -> CIImage {
+        mask.clampedToExtent()
+            .applyingFilter("CIGaussianBlur", parameters: [kCIInputRadiusKey: 0.6])
+            .cropped(to: mask.extent)
+    }
+
+    private static func substantialInstances(in observation: VNInstanceMaskObservation, subjectPoint: CGPoint?, primaryOnly: Bool = false) throws -> IndexSet {
         let mask = observation.instanceMask
         guard CVPixelBufferGetPixelFormatType(mask) == kCVPixelFormatType_OneComponent8,
               CVPixelBufferLockBaseAddress(mask, .readOnly) == kCVReturnSuccess else {
@@ -436,10 +412,29 @@ enum PlatingImage {
             return IndexSet(integer: label)
         }
         var area = Array(repeating: 0, count: 256)
+        var bounds = Array(repeating: CGRect.null, count: 256)
         for y in 0..<height {
-            for x in 0..<width { area[Int(pixels[y * stride + x])] += 1 }
+            for x in 0..<width {
+                let label = Int(pixels[y * stride + x])
+                area[label] += 1
+                if primaryOnly && label != 0 {
+                    bounds[label] = bounds[label].union(CGRect(x: x, y: y, width: 1, height: 1))
+                }
+            }
         }
         let supported = observation.allInstances.filter { $0 < area.count }
+        if primaryOnly {
+            let objects = supported.compactMap { label -> ForegroundSelection.Object? in
+                guard area[label] > 0 else { return nil }
+                let box = bounds[label]
+                return .init(id: label, pixels: area[label],
+                             bounds: CGRect(x: box.minX / CGFloat(width), y: box.minY / CGFloat(height),
+                                            width: box.width / CGFloat(width), height: box.height / CGFloat(height)))
+            }
+            let selected = ForegroundSelection.choose(objects)
+            guard !selected.isEmpty else { throw CocoaError(.fileReadCorruptFile) }
+            return selected
+        }
         let largest = supported.map { area[$0] }.max() ?? 0
         guard largest > 0 else { return observation.allInstances }
         let minimumArea = max(1, min(largest / 30, width * height / 220))

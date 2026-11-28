@@ -32,6 +32,7 @@ struct ProfileView: View {
     @AppStorage("menuBooks") private var storedBooks = "[]"
     @AppStorage("selectedMenuBook") private var selectedBookID = MenuBook.defaultID
     @AppStorage("appLanguage", store: .standard) private var language = AppLanguage.defaultCode
+    @AppStorage("hapticsEnabled", store: .standard) private var hapticsEnabled = true
     @State private var editing = false
     @State private var choosingLanguage = false
     @State private var showingOnboarding = false
@@ -44,7 +45,7 @@ struct ProfileView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
-                Button { editing = true } label: {
+                Button { CrumbHaptics.tap(); editing = true } label: {
                     HStack(spacing: 18) {
                         ProfileAvatar(size: 84)
                             .overlay(alignment: .bottomTrailing) {
@@ -63,20 +64,29 @@ struct ProfileView: View {
                 }.buttonStyle(.plain).accessibilityLabel("プロフィールを編集")
 
                 VStack(spacing: 0) {
-                    NavigationLink { MenuBookManager() } label: {
-                        profileRow("メニューブックを管理", icon: "book", value: books.first { $0.id == selectedBookID }?.name ?? "My Menu")
+                    NavigationLink(value: AlbumRoute.books) {
+                        profileRow("メニューブックを管理", icon: "book", value: books.first { $0.id == selectedBookID }?.name ?? AppLanguage.text("My Menu"))
                     }.buttonStyle(.plain)
                     Divider().padding(.leading, 54)
-                    Button { choosingLanguage = true } label: {
+                    Button { CrumbHaptics.tap(); choosingLanguage = true } label: {
                         profileRow("言語", icon: "globe", value: languageName)
                     }.buttonStyle(.plain)
+                    Divider().padding(.leading, 54)
+                    Toggle(isOn: $hapticsEnabled) {
+                        HStack(spacing: 14) {
+                            Image(systemName: "hand.tap").font(.title3).frame(width: 26)
+                            Text("操作時の振動").font(.system(.body).weight(.semibold))
+                        }
+                    }
+                    .tint(ink).padding(18).frame(minHeight: 64)
                 }
                 .background(ink.opacity(0.035), in: .rect(cornerRadius: 22))
-                Button { showingOnboarding = true } label: {
+                Button { CrumbHaptics.tap(); showingOnboarding = true } label: {
                     profileRow("アプリの使い方", icon: "questionmark.circle", value: "")
                 }
                 .buttonStyle(.plain)
                 .background(ink.opacity(0.035), in: .rect(cornerRadius: 22))
+                PlusSettingsSection()
                 AccountSettingsSection()
             }
             .padding(22)
@@ -119,10 +129,10 @@ private struct ProfileEditor: View {
                         Spacer()
                         VStack(spacing: 12) {
                             AvatarImage(data: photo, size: 96)
-                            PhotosPicker("写真を変更", selection: $item, matching: .images)
+                            PhotosPicker("写真を変更", selection: $item, matching: .images).hapticActivation()
                             if loading { ProgressView() }
                             if !photo.isEmpty {
-                                Button("デフォルトの顔に戻す") { photo = Data(); item = nil }
+                                Button("デフォルトの顔に戻す") { CrumbHaptics.tap(); photo = Data(); item = nil }
                             }
                         }
                         Spacer()
@@ -132,11 +142,12 @@ private struct ProfileEditor: View {
             }
             .navigationTitle("プロフィールを編集").navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("キャンセル") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button("キャンセル") { CrumbHaptics.tap(); dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") {
+                    Button("保存") { CrumbHaptics.tap();
                         savedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
                         savedPhoto = photo
+                        NotificationCenter.default.post(name: .crumbLibraryChanged, object: nil)
                         dismiss()
                     }.disabled(loading)
                 }
@@ -164,48 +175,7 @@ private struct ProfileEditor: View {
                     photo = encoded
                 } catch { if !Task.isCancelled { failed = true } }
             }
-            .alert("写真を読み込めませんでした", isPresented: $failed) { Button("閉じる", role: .cancel) {} }
-        }
-    }
-}
-
-private struct MenuBookManager: View {
-    @Query private var meals: [Meal]
-    @AppStorage("menuBooks") private var storedBooks = "[]"
-    @AppStorage("selectedMenuBook") private var selectedBookID = MenuBook.defaultID
-    @State private var adding = false
-    @State private var newName = ""
-    var body: some View {
-        List {
-            ForEach(MenuBook.decode(storedBooks)) { book in
-                Button { selectedBookID = book.id } label: {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: book.name).fontWeight(.semibold)
-                            let count = meals.filter { $0.wantToVisit != true && ($0.menuBookID ?? MenuBook.defaultID) == book.id }.count
-                            Text("\(count)レシピ").font(.caption).foregroundStyle(secondaryInk)
-                        }
-                        Spacer()
-                        if selectedBookID == book.id { Image(systemName: "checkmark") }
-                    }.foregroundStyle(ink).padding(.vertical, 5)
-                }
-            }
-            Button("メニューブックを追加", systemImage: "plus") { newName = ""; adding = true }
-        }
-        .navigationTitle("メニューブックを管理").navigationBarTitleDisplayMode(.inline)
-        .alert("メニューブックを追加", isPresented: $adding) {
-            TextField("メニューブック名", text: $newName)
-            Button("追加") {
-                let clean = newName.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !clean.isEmpty else { return }
-                let books = MenuBook.decode(storedBooks)
-                if let book = books.first(where: { RecipeCategories.matches($0.name, clean) }) { selectedBookID = book.id }
-                else {
-                    let book = MenuBook(id: UUID().uuidString, name: clean)
-                    storedBooks = MenuBook.encode(books + [book]); selectedBookID = book.id
-                }
-            }.disabled(newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            Button("キャンセル", role: .cancel) {}
+            .alert("写真を読み込めませんでした", isPresented: $failed) { Button("閉じる", role: .cancel) { CrumbHaptics.tap() } }
         }
     }
 }

@@ -7,90 +7,194 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		023B7FF8A686E74A1936D745 /* crumb-thinking.png in Resources */ = {isa = PBXBuildFile; fileRef = B8C1B8A6A6BE308C1A05B18C /* crumb-thinking.png */; };
 		0300D3E7D455D72AE812F81F /* PhotoPlating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735185B90C14D47C3874035B /* PhotoPlating.swift */; };
 		04FCF64C224A1B537123B698 /* standard-plate-09.png in Resources */ = {isa = PBXBuildFile; fileRef = 69443D86B62D3A1BE35697E0 /* standard-plate-09.png */; };
+		0A9132F55F58538F7BB74D42 /* PlanPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66452E5E73B28EEF5355CF52 /* PlanPolicy.swift */; };
+		0D7311BDBB17A7EF4636ACF3 /* CloudLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960A46FA2CBE210D159459B2 /* CloudLibrary.swift */; };
+		0DAEC12440482FDD2BF19319 /* crumb-food-thoughts.png in Resources */ = {isa = PBXBuildFile; fileRef = A872713A912F2A849458567E /* crumb-food-thoughts.png */; };
+		15604ED832C46A01002A3D59 /* ForegroundSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3423BA92A22EABAE7683867 /* ForegroundSelection.swift */; };
 		1E3D1A9532639DCA2489BBE6 /* pudding.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 8E1A047CA53F3DA52BB09AB0 /* pudding.jpg */; };
 		20E4ECDDA93751B8F6CE76F4 /* Nunito-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 61F461D3F84F0BD799FB1118 /* Nunito-Regular.ttf */; };
 		223EBD5F775A0BA64234114C /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2513890E96E65F4E4E42751B /* OFL.txt */; };
+		25603A0AFFCBB8B60E51CEAB /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFAF42CD311A5800F8D2BF56 /* ShareViewController.swift */; };
 		25FF5986148061D176DC22E4 /* Meals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089F3A52C5CA4BFB4FE3EF2F /* Meals.swift */; };
+		26F5953ACC58D8DDA9AC8CAE /* PlusViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5242114A6EAF72EC4E4A3588 /* PlusViews.swift */; };
 		271CA8E4E5E87998347E0D65 /* MealDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEAC080AE68AFCDD6893047 /* MealDetail.swift */; };
+		285A86D58910A547697D6DC3 /* NutritionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E722B532E31098CCF17883 /* NutritionView.swift */; };
 		2A90EDC376E76190E10AA8AB /* CrumbIcon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5104F54CFF996B02D05137F6 /* CrumbIcon@3x.png */; };
 		2DC6E7A565D04BF5978150A5 /* standard-plate-05.png in Resources */ = {isa = PBXBuildFile; fileRef = DB569EAAB5B40AF92C5E0442 /* standard-plate-05.png */; };
+		2F180757B4635ECBC060747F /* ceramic-five.png in Resources */ = {isa = PBXBuildFile; fileRef = 6E69376F02DF937A1B6F8955 /* ceramic-five.png */; };
 		2F9519C7FFBF6907C2A3757B /* BricolageGrotesque-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCAA1BADF4E8AD8929F9E871 /* BricolageGrotesque-Bold.ttf */; };
 		2FC1C1DC2BA71FA1FE621F4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04A0A5E1548D0E7835037F01 /* Assets.xcassets */; };
 		2FE1D5DA2A90A4CF0D092446 /* CrumbFace.png in Resources */ = {isa = PBXBuildFile; fileRef = 637DD52C5008DB806F40EAE7 /* CrumbFace.png */; };
 		2FF3DC0D6D18D8B772FCB244 /* standard-plate-02.png in Resources */ = {isa = PBXBuildFile; fileRef = C2028557F5AE7D10111A1566 /* standard-plate-02.png */; };
 		30970ED5F44575646EE98167 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A4B4F27B77753119E2DD2358 /* Localizable.strings */; };
 		313B057B348A8238CE5C9755 /* Nunito-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 789F516AD95BA8053C267136 /* Nunito-SemiBold.ttf */; };
+		34F04B5D0B350E1A60C61B58 /* AskCrumbSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB89897B93CA012368DB1855 /* AskCrumbSessionTests.swift */; };
+		3B77CC7FB1C410599732F839 /* RecipeInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932D93380F0EA09F5723F36C /* RecipeInbox.swift */; };
 		3C15CF2C1980B7B901A7E917 /* HomePlateEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDEC2B987BC1D23243456B8C /* HomePlateEditor.swift */; };
 		3CB9A8F36E52318DDDCF0DA0 /* standard-plate-11.png in Resources */ = {isa = PBXBuildFile; fileRef = 38E6AEBAEFD4BD94643CB928 /* standard-plate-11.png */; };
+		439963FCED8A874D669BF98A /* CrumbShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 64CF8BC822BD827FB10E03D3 /* CrumbShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		43F00CF46904C6295D25B6E4 /* usda-foods.json in Resources */ = {isa = PBXBuildFile; fileRef = 43D5DBF1A03274F2EDE1E9D4 /* usda-foods.json */; };
 		44EAA9A6BA8733662F1FB0AE /* carbonara.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A7A6D199E45B1BC2A910A8E8 /* carbonara.jpg */; };
+		47FA73A59F0E90DAAB4CCFA9 /* RecipeImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60B23623DF93CB1B626EC43 /* RecipeImportTests.swift */; };
 		4A4277A5E341022DC938DCE3 /* Nunito-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5162643B6715F782016CEFFD /* Nunito-Medium.ttf */; };
 		4A6F366E70185DA2FE75FDBF /* AccountViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC49EBD2C8334BAB931C48A5 /* AccountViews.swift */; };
+		4BA49B4BFFC837519C313571 /* CrumbAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD4CBC60E8751A656B3892C5 /* CrumbAssistant.swift */; };
+		4BEB99840F4ED1777C01E6C3 /* ceramic-pair.png in Resources */ = {isa = PBXBuildFile; fileRef = 49FF6FAC68C987952F62C0E5 /* ceramic-pair.png */; };
 		4D7D054180303A24B06FF3BC /* RecipeMediaPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1E77F1CCFF1A5973E0CE88 /* RecipeMediaPicker.swift */; };
+		4EAD040CD6DB05315B5FFC3C /* ceramic-green.png in Resources */ = {isa = PBXBuildFile; fileRef = 5293A58981F50CE86DFFE9A5 /* ceramic-green.png */; };
 		4EE3B4A0F2BA524EEA8D037A /* MealEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23DC99CE273FD5333B8AED1A /* MealEditor.swift */; };
+		55DB52329C1476E414B82C77 /* Nutrition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D56ACEF333F4FEBB2512D62 /* Nutrition.swift */; };
+		579D0BF30CB45EE7BE3FB18D /* RecipeAssistantTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E7F8AF71EEE62543088836 /* RecipeAssistantTests.swift */; };
 		58E4C42C14B37673432D1013 /* standard-plate-01.png in Resources */ = {isa = PBXBuildFile; fileRef = D29806B4470FB6A1D2C6D8E3 /* standard-plate-01.png */; };
+		59B6A5EA16DFB5AF0792CAC2 /* AtlasTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C056D0463275AE35A9EFFB7 /* AtlasTexture.swift */; };
 		5E64FA2EB2D03016622446B6 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8007ACE6BE156DCE16742936 /* ProfileView.swift */; };
+		615F62214BD3CA5495114A7C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A94E65F2CE45092E3A66578D /* InfoPlist.strings */; };
+		644E7B026417044D940E47FF /* RecipeInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932D93380F0EA09F5723F36C /* RecipeInbox.swift */; };
+		65DE00A1534F6842F9F67251 /* SubscriptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045DCD29D6FF329A8E390D31 /* SubscriptionTests.swift */; };
 		67D5EB6FFFC95F8C30D003FF /* standard-plate-14.png in Resources */ = {isa = PBXBuildFile; fileRef = CDD13A3F8EA1FD28569D07CC /* standard-plate-14.png */; };
 		6B349C12351EE44D1158DEFF /* standard-plate-15.png in Resources */ = {isa = PBXBuildFile; fileRef = 20D5369C5B5299ACA39957BB /* standard-plate-15.png */; };
 		6F04E1566330622D56904463 /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4ED83DF6CDA85D73EAB9F2B /* Recipe.swift */; };
+		767D48D48BA3C96362DEBCF0 /* LibraryMerge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3C72DBA0C0283878813B0E /* LibraryMerge.swift */; };
 		7B89ABEE8C8C52C0A78C784F /* Nunito-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE0083F469D2E31FE7110A9C /* Nunito-OFL.txt */; };
 		7F1B642E5EE64554DE8522F5 /* standard-plate-04.png in Resources */ = {isa = PBXBuildFile; fileRef = 648F6A22B2170FCB8B989AC8 /* standard-plate-04.png */; };
+		83B71887D604405AE3A558D4 /* MealPlanViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72217A67ABE99ABEB5AF068E /* MealPlanViews.swift */; };
+		8407E96226558AB3D1676D70 /* AskCrumbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE465B7AF073F3B13C22B11A /* AskCrumbView.swift */; };
 		8B76C1A646FF633A86718BB6 /* ShapePhotoEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6ED1F1E0C23E6E5CB7FD2D /* ShapePhotoEditor.swift */; };
+		8C5E5F036A0838166F30F277 /* LibraryMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55496A18F9C4AABD602C0F84 /* LibraryMergeTests.swift */; };
+		8D985D82C3F9F539BFBC45AD /* RecipeCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58341B39A097841D49ECB834 /* RecipeCapture.swift */; };
+		8F6CD8086EFEA33F3D4EDEB8 /* PlusStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E30D52617EF2832A43C1984 /* PlusStore.swift */; };
+		90CFA9FA36670A30C0869D7E /* Crumb.storekit in Resources */ = {isa = PBXBuildFile; fileRef = B5C605C0B1877B45E7663B84 /* Crumb.storekit */; };
+		99625176261D550CE1F91D0D /* EmptyRecipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F8F00B53E97420964F7500 /* EmptyRecipeView.swift */; };
 		9EE88062E389718B97E14005 /* standard-plate-07.png in Resources */ = {isa = PBXBuildFile; fileRef = DC723AE4C524F24BDAE43C94 /* standard-plate-07.png */; };
+		AA608DFA2C9995EFE6B94715 /* LocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBC1F924CA237A8A01081909 /* LocalizationTests.swift */; };
 		AE762F6E355E0BC7386D3D1C /* standard-plate-03.png in Resources */ = {isa = PBXBuildFile; fileRef = 88AF6C95E4FC5EC31F54156D /* standard-plate-03.png */; };
+		AEE0C2A91B97A10648354438 /* crumb-thought-frames.png in Resources */ = {isa = PBXBuildFile; fileRef = 06673123C450F964D7DD93FB /* crumb-thought-frames.png */; };
 		B3220EED99F6C8A6721155FA /* AccountSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6685B4377780A22975915 /* AccountSession.swift */; };
-		B9B0F866D0F3790E831CBBC5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 777B90C2BDE91B0EB8D66BC9 /* InfoPlist.strings */; };
+		B8E94755661A23BFEDB8747E /* CategoryActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE553AFD3B45C25CA9A13B1 /* CategoryActions.swift */; };
+		BBA0C7E7CAF0308C7296F787 /* crumb-cooking.png in Resources */ = {isa = PBXBuildFile; fileRef = E44AD30CF6CA18DC2886FD1F /* crumb-cooking.png */; };
+		BFA44E29A292F2492941EBE1 /* SupabaseREST.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97FC2B53A196C823AAF43902 /* SupabaseREST.swift */; };
 		C1AE7DEE80E85FB48922B7E1 /* CrumbIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F5E27FF6C1EA56EF830F0977 /* CrumbIcon@2x.png */; };
 		C9766E69B1EAC7531920C479 /* standard-plate-12.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A5D132EF1D2FD80353FCB64 /* standard-plate-12.png */; };
+		CB7E3C373A7B3BD11DE0A7A9 /* AssistantWaiting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F85CEC983BCCD56495C6CB5 /* AssistantWaiting.swift */; };
 		CC86767C57C560BBC89F1B47 /* standard-plate-06.png in Resources */ = {isa = PBXBuildFile; fileRef = CF736F54F3C9CDCAC15F2A6A /* standard-plate-06.png */; };
 		CEF8A8D1E39B9B56FDA8015A /* GuidedRecipeCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD92DE98DE9A263B34445278 /* GuidedRecipeCamera.swift */; };
 		D110C8D0BF653595886F83F1 /* PlatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789C188AF1D8FC49DBFD97 /* PlatePicker.swift */; };
 		D4E395E40BC8EAB6F903FB8C /* curry.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CBD199D2F417AE12A242034A /* curry.jpg */; };
-		DDD789F07A420F0EF9CC560E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 73A9B533BABCD3BA010D37A8 /* InfoPlist.strings */; };
+		DD4BD5AC19818EE24204F25E /* RecipeImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B822B9EB7D72C152589A77 /* RecipeImport.swift */; };
 		E31D87EB5322C719B8BAD292 /* standard-plate-10.png in Resources */ = {isa = PBXBuildFile; fileRef = 53693BA4CD2731AB8132AAF3 /* standard-plate-10.png */; };
 		E78E0507F73985CE5F976166 /* standard-plate-13.png in Resources */ = {isa = PBXBuildFile; fileRef = C74F937674385FF2AF8E9F7C /* standard-plate-13.png */; };
 		E8F6D0734424CA0A79F8FE10 /* MealPhotoCropper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE58C5BCEDB9387350BE7D01 /* MealPhotoCropper.swift */; };
 		EF4F73740F3F2CE420373949 /* vegetables.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 6F356194DC133818BEB11B7E /* vegetables.jpg */; };
+		F33026CA57C1DD0D5079592E /* ForegroundSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4104E341280EF5C3408942F7 /* ForegroundSelectionTests.swift */; };
 		F34D47B6B098EF34C03FC8C3 /* standard-plate-08.png in Resources */ = {isa = PBXBuildFile; fileRef = 5C71A1B63A24A1E1E63EA0D4 /* standard-plate-08.png */; };
+		F434CBFCEED731894C3556EB /* RecipeDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = D199ACA530BF04A38674B87F /* RecipeDraft.swift */; };
+		FE09DFAD5B763A122A230E3E /* RecipeCategoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B18CED8A5FC40D9E5D8A61 /* RecipeCategoryTests.swift */; };
 		FF8B916E209E5797F8E4FAD5 /* CrumbApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 984FFCC51DE624CB37D589E5 /* CrumbApp.swift */; };
+		FFBB5AA210E48D82823BAAD2 /* MenuBookViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143FC0210849E40F305F30D1 /* MenuBookViews.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		1C22CEC1596FDD12125058EB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3C86C3999D71DA49210313DD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0693FF7C5ADE62C6D99F1704;
+			remoteInfo = crumb;
+		};
+		637884221010BAF70629F2DF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3C86C3999D71DA49210313DD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B8C781A99EF072D287E0A194;
+			remoteInfo = CrumbShare;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A0197BC0E4215D609E5328F9 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				439963FCED8A874D669BF98A /* CrumbShare.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		045DCD29D6FF329A8E390D31 /* SubscriptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionTests.swift; sourceTree = "<group>"; };
 		04A0A5E1548D0E7835037F01 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		06673123C450F964D7DD93FB /* crumb-thought-frames.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "crumb-thought-frames.png"; sourceTree = "<group>"; };
 		089F3A52C5CA4BFB4FE3EF2F /* Meals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meals.swift; sourceTree = "<group>"; };
+		143FC0210849E40F305F30D1 /* MenuBookViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBookViews.swift; sourceTree = "<group>"; };
+		1D56ACEF333F4FEBB2512D62 /* Nutrition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Nutrition.swift; sourceTree = "<group>"; };
+		1E30D52617EF2832A43C1984 /* PlusStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlusStore.swift; sourceTree = "<group>"; };
 		20D5369C5B5299ACA39957BB /* standard-plate-15.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-15.png"; sourceTree = "<group>"; };
 		23DC99CE273FD5333B8AED1A /* MealEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealEditor.swift; sourceTree = "<group>"; };
 		2513890E96E65F4E4E42751B /* OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
+		31E7F8AF71EEE62543088836 /* RecipeAssistantTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeAssistantTests.swift; sourceTree = "<group>"; };
+		334389DFCC71E43ED0C72D0A /* CrumbTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CrumbTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		37A6685B4377780A22975915 /* AccountSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSession.swift; sourceTree = "<group>"; };
 		37D1685F11BBD93FC9E85F2D /* crumb.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = crumb.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		38E6AEBAEFD4BD94643CB928 /* standard-plate-11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-11.png"; sourceTree = "<group>"; };
+		3EF3AA849CAC41568CE8CABE /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4104E341280EF5C3408942F7 /* ForegroundSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForegroundSelectionTests.swift; sourceTree = "<group>"; };
+		43D5DBF1A03274F2EDE1E9D4 /* usda-foods.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "usda-foods.json"; sourceTree = "<group>"; };
+		49FF6FAC68C987952F62C0E5 /* ceramic-pair.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ceramic-pair.png"; sourceTree = "<group>"; };
 		4A6ED1F1E0C23E6E5CB7FD2D /* ShapePhotoEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShapePhotoEditor.swift; sourceTree = "<group>"; };
+		4C056D0463275AE35A9EFFB7 /* AtlasTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtlasTexture.swift; sourceTree = "<group>"; };
 		4C1E77F1CCFF1A5973E0CE88 /* RecipeMediaPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeMediaPicker.swift; sourceTree = "<group>"; };
 		5104F54CFF996B02D05137F6 /* CrumbIcon@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CrumbIcon@3x.png"; sourceTree = "<group>"; };
 		5162643B6715F782016CEFFD /* Nunito-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Medium.ttf"; sourceTree = "<group>"; };
+		5242114A6EAF72EC4E4A3588 /* PlusViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlusViews.swift; sourceTree = "<group>"; };
+		5293A58981F50CE86DFFE9A5 /* ceramic-green.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ceramic-green.png"; sourceTree = "<group>"; };
 		53693BA4CD2731AB8132AAF3 /* standard-plate-10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-10.png"; sourceTree = "<group>"; };
+		55496A18F9C4AABD602C0F84 /* LibraryMergeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryMergeTests.swift; sourceTree = "<group>"; };
+		5631CDD374EDD629ED3FA2E6 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		58341B39A097841D49ECB834 /* RecipeCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeCapture.swift; sourceTree = "<group>"; };
 		5C71A1B63A24A1E1E63EA0D4 /* standard-plate-08.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-08.png"; sourceTree = "<group>"; };
 		61D1C1D9AAEFD2C3E771191F /* Defaults.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Defaults.xcconfig; sourceTree = "<group>"; };
 		61F461D3F84F0BD799FB1118 /* Nunito-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Regular.ttf"; sourceTree = "<group>"; };
 		637DD52C5008DB806F40EAE7 /* CrumbFace.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CrumbFace.png; sourceTree = "<group>"; };
 		648F6A22B2170FCB8B989AC8 /* standard-plate-04.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-04.png"; sourceTree = "<group>"; };
+		64CF8BC822BD827FB10E03D3 /* CrumbShare.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = CrumbShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		66452E5E73B28EEF5355CF52 /* PlanPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanPolicy.swift; sourceTree = "<group>"; };
 		66789C188AF1D8FC49DBFD97 /* PlatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatePicker.swift; sourceTree = "<group>"; };
 		69443D86B62D3A1BE35697E0 /* standard-plate-09.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-09.png"; sourceTree = "<group>"; };
+		6E69376F02DF937A1B6F8955 /* ceramic-five.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ceramic-five.png"; sourceTree = "<group>"; };
 		6F356194DC133818BEB11B7E /* vegetables.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = vegetables.jpg; sourceTree = "<group>"; };
+		72217A67ABE99ABEB5AF068E /* MealPlanViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealPlanViews.swift; sourceTree = "<group>"; };
 		735185B90C14D47C3874035B /* PhotoPlating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPlating.swift; sourceTree = "<group>"; };
-		73A9B533BABCD3BA010D37A8 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		777B90C2BDE91B0EB8D66BC9 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		789F516AD95BA8053C267136 /* Nunito-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-SemiBold.ttf"; sourceTree = "<group>"; };
+		7F3C72DBA0C0283878813B0E /* LibraryMerge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryMerge.swift; sourceTree = "<group>"; };
 		8007ACE6BE156DCE16742936 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		84D899AD14FECEFDE4E14116 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		88AF6C95E4FC5EC31F54156D /* standard-plate-03.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-03.png"; sourceTree = "<group>"; };
 		8A5D132EF1D2FD80353FCB64 /* standard-plate-12.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-12.png"; sourceTree = "<group>"; };
 		8E1A047CA53F3DA52BB09AB0 /* pudding.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = pudding.jpg; sourceTree = "<group>"; };
+		8F85CEC983BCCD56495C6CB5 /* AssistantWaiting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantWaiting.swift; sourceTree = "<group>"; };
+		91B18CED8A5FC40D9E5D8A61 /* RecipeCategoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeCategoryTests.swift; sourceTree = "<group>"; };
+		932D93380F0EA09F5723F36C /* RecipeInbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeInbox.swift; sourceTree = "<group>"; };
+		960A46FA2CBE210D159459B2 /* CloudLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudLibrary.swift; sourceTree = "<group>"; };
 		96A773D8DBE389468CF64038 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
+		97FC2B53A196C823AAF43902 /* SupabaseREST.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseREST.swift; sourceTree = "<group>"; };
 		984FFCC51DE624CB37D589E5 /* CrumbApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrumbApp.swift; sourceTree = "<group>"; };
 		9E56CFFAD11F7F1B4E797682 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A3423BA92A22EABAE7683867 /* ForegroundSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForegroundSelection.swift; sourceTree = "<group>"; };
+		A4B822B9EB7D72C152589A77 /* RecipeImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeImport.swift; sourceTree = "<group>"; };
+		A60B23623DF93CB1B626EC43 /* RecipeImportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeImportTests.swift; sourceTree = "<group>"; };
 		A7A6D199E45B1BC2A910A8E8 /* carbonara.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = carbonara.jpg; sourceTree = "<group>"; };
+		A872713A912F2A849458567E /* crumb-food-thoughts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "crumb-food-thoughts.png"; sourceTree = "<group>"; };
 		AD92DE98DE9A263B34445278 /* GuidedRecipeCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedRecipeCamera.swift; sourceTree = "<group>"; };
+		B5C605C0B1877B45E7663B84 /* Crumb.storekit */ = {isa = PBXFileReference; path = Crumb.storekit; sourceTree = "<group>"; };
+		B8C1B8A6A6BE308C1A05B18C /* crumb-thinking.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "crumb-thinking.png"; sourceTree = "<group>"; };
+		BBC1F924CA237A8A01081909 /* LocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationTests.swift; sourceTree = "<group>"; };
 		C2028557F5AE7D10111A1566 /* standard-plate-02.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-02.png"; sourceTree = "<group>"; };
 		C74F937674385FF2AF8E9F7C /* standard-plate-13.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-13.png"; sourceTree = "<group>"; };
 		CBD199D2F417AE12A242034A /* curry.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = curry.jpg; sourceTree = "<group>"; };
@@ -98,24 +202,45 @@
 		CDEC2B987BC1D23243456B8C /* HomePlateEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePlateEditor.swift; sourceTree = "<group>"; };
 		CE0083F469D2E31FE7110A9C /* Nunito-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Nunito-OFL.txt"; sourceTree = "<group>"; };
 		CF736F54F3C9CDCAC15F2A6A /* standard-plate-06.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-06.png"; sourceTree = "<group>"; };
+		D199ACA530BF04A38674B87F /* RecipeDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDraft.swift; sourceTree = "<group>"; };
 		D29806B4470FB6A1D2C6D8E3 /* standard-plate-01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-01.png"; sourceTree = "<group>"; };
+		D9747A9696A292949EDEC898 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D99D3F7A1CAAEE525E94F2F5 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DB569EAAB5B40AF92C5E0442 /* standard-plate-05.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-05.png"; sourceTree = "<group>"; };
+		DB89897B93CA012368DB1855 /* AskCrumbSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskCrumbSessionTests.swift; sourceTree = "<group>"; };
+		DBE553AFD3B45C25CA9A13B1 /* CategoryActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryActions.swift; sourceTree = "<group>"; };
 		DBEAC080AE68AFCDD6893047 /* MealDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealDetail.swift; sourceTree = "<group>"; };
 		DC723AE4C524F24BDAE43C94 /* standard-plate-07.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "standard-plate-07.png"; sourceTree = "<group>"; };
 		DCAA1BADF4E8AD8929F9E871 /* BricolageGrotesque-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BricolageGrotesque-Bold.ttf"; sourceTree = "<group>"; };
+		DE465B7AF073F3B13C22B11A /* AskCrumbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskCrumbView.swift; sourceTree = "<group>"; };
+		E44AD30CF6CA18DC2886FD1F /* crumb-cooking.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "crumb-cooking.png"; sourceTree = "<group>"; };
+		E4E722B532E31098CCF17883 /* NutritionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionView.swift; sourceTree = "<group>"; };
 		F4ED83DF6CDA85D73EAB9F2B /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
 		F5E27FF6C1EA56EF830F0977 /* CrumbIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CrumbIcon@2x.png"; sourceTree = "<group>"; };
+		F9F8F00B53E97420964F7500 /* EmptyRecipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyRecipeView.swift; sourceTree = "<group>"; };
 		FC49EBD2C8334BAB931C48A5 /* AccountViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViews.swift; sourceTree = "<group>"; };
+		FD4CBC60E8751A656B3892C5 /* CrumbAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrumbAssistant.swift; sourceTree = "<group>"; };
 		FE58C5BCEDB9387350BE7D01 /* MealPhotoCropper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealPhotoCropper.swift; sourceTree = "<group>"; };
+		FFAF42CD311A5800F8D2BF56 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		11B0BEDE80A9DC88FDFB7C15 /* StoreKit */ = {
+			isa = PBXGroup;
+			children = (
+				B5C605C0B1877B45E7663B84 /* Crumb.storekit */,
+			);
+			path = StoreKit;
+			sourceTree = "<group>";
+		};
 		2241C99C2082135002EB116F = {
 			isa = PBXGroup;
 			children = (
 				2519DD9A39907316F6DF7852 /* Config */,
 				640409E50DA2EB8B411E4A10 /* Crumb */,
+				9359BD9780BE89FEAFF07C93 /* CrumbTests */,
+				3A29D45450C5EA3ABC936ABC /* ShareExtension */,
+				11B0BEDE80A9DC88FDFB7C15 /* StoreKit */,
 				D9089B3298336A8994569ACC /* Products */,
 			);
 			sourceTree = "<group>";
@@ -126,6 +251,31 @@
 				61D1C1D9AAEFD2C3E771191F /* Defaults.xcconfig */,
 			);
 			path = Config;
+			sourceTree = "<group>";
+		};
+		3A29D45450C5EA3ABC936ABC /* ShareExtension */ = {
+			isa = PBXGroup;
+			children = (
+				FFAF42CD311A5800F8D2BF56 /* ShareViewController.swift */,
+			);
+			path = ShareExtension;
+			sourceTree = "<group>";
+		};
+		41068B07BB3A09C5E4CB98DC /* AssistantArt */ = {
+			isa = PBXGroup;
+			children = (
+				E44AD30CF6CA18DC2886FD1F /* crumb-cooking.png */,
+				B8C1B8A6A6BE308C1A05B18C /* crumb-thinking.png */,
+			);
+			path = AssistantArt;
+			sourceTree = "<group>";
+		};
+		44D9EBD913480D72F9B1642A /* NutritionData */ = {
+			isa = PBXGroup;
+			children = (
+				43D5DBF1A03274F2EDE1E9D4 /* usda-foods.json */,
+			);
+			path = NutritionData;
 			sourceTree = "<group>";
 		};
 		451F96D334D2100644B06BD9 /* Samples */ = {
@@ -157,37 +307,86 @@
 			children = (
 				37A6685B4377780A22975915 /* AccountSession.swift */,
 				FC49EBD2C8334BAB931C48A5 /* AccountViews.swift */,
+				DE465B7AF073F3B13C22B11A /* AskCrumbView.swift */,
 				04A0A5E1548D0E7835037F01 /* Assets.xcassets */,
+				8F85CEC983BCCD56495C6CB5 /* AssistantWaiting.swift */,
+				4C056D0463275AE35A9EFFB7 /* AtlasTexture.swift */,
+				DBE553AFD3B45C25CA9A13B1 /* CategoryActions.swift */,
+				960A46FA2CBE210D159459B2 /* CloudLibrary.swift */,
 				984FFCC51DE624CB37D589E5 /* CrumbApp.swift */,
+				FD4CBC60E8751A656B3892C5 /* CrumbAssistant.swift */,
 				637DD52C5008DB806F40EAE7 /* CrumbFace.png */,
 				F5E27FF6C1EA56EF830F0977 /* CrumbIcon@2x.png */,
 				5104F54CFF996B02D05137F6 /* CrumbIcon@3x.png */,
+				F9F8F00B53E97420964F7500 /* EmptyRecipeView.swift */,
+				A3423BA92A22EABAE7683867 /* ForegroundSelection.swift */,
 				AD92DE98DE9A263B34445278 /* GuidedRecipeCamera.swift */,
 				CDEC2B987BC1D23243456B8C /* HomePlateEditor.swift */,
-				73A9B533BABCD3BA010D37A8 /* InfoPlist.strings */,
-				777B90C2BDE91B0EB8D66BC9 /* InfoPlist.strings */,
+				7F3C72DBA0C0283878813B0E /* LibraryMerge.swift */,
 				DBEAC080AE68AFCDD6893047 /* MealDetail.swift */,
 				23DC99CE273FD5333B8AED1A /* MealEditor.swift */,
 				FE58C5BCEDB9387350BE7D01 /* MealPhotoCropper.swift */,
+				72217A67ABE99ABEB5AF068E /* MealPlanViews.swift */,
 				089F3A52C5CA4BFB4FE3EF2F /* Meals.swift */,
+				143FC0210849E40F305F30D1 /* MenuBookViews.swift */,
+				1D56ACEF333F4FEBB2512D62 /* Nutrition.swift */,
+				E4E722B532E31098CCF17883 /* NutritionView.swift */,
 				735185B90C14D47C3874035B /* PhotoPlating.swift */,
+				66452E5E73B28EEF5355CF52 /* PlanPolicy.swift */,
 				66789C188AF1D8FC49DBFD97 /* PlatePicker.swift */,
+				1E30D52617EF2832A43C1984 /* PlusStore.swift */,
+				5242114A6EAF72EC4E4A3588 /* PlusViews.swift */,
 				8007ACE6BE156DCE16742936 /* ProfileView.swift */,
 				F4ED83DF6CDA85D73EAB9F2B /* Recipe.swift */,
+				58341B39A097841D49ECB834 /* RecipeCapture.swift */,
+				D199ACA530BF04A38674B87F /* RecipeDraft.swift */,
+				A4B822B9EB7D72C152589A77 /* RecipeImport.swift */,
+				932D93380F0EA09F5723F36C /* RecipeInbox.swift */,
 				4C1E77F1CCFF1A5973E0CE88 /* RecipeMediaPicker.swift */,
 				4A6ED1F1E0C23E6E5CB7FD2D /* ShapePhotoEditor.swift */,
+				97FC2B53A196C823AAF43902 /* SupabaseREST.swift */,
+				41068B07BB3A09C5E4CB98DC /* AssistantArt */,
+				B3A579A832C1A9B0FE0931F4 /* EmptyStateArt */,
 				589BFDEC5172F1022C6AD3BA /* Fonts */,
+				A94E65F2CE45092E3A66578D /* InfoPlist.strings */,
 				A4B4F27B77753119E2DD2358 /* Localizable.strings */,
+				44D9EBD913480D72F9B1642A /* NutritionData */,
 				451F96D334D2100644B06BD9 /* Samples */,
 				E6CD1DBC9D117B2BA5B4D971 /* StandardPlates */,
 			);
 			path = Crumb;
 			sourceTree = "<group>";
 		};
+		9359BD9780BE89FEAFF07C93 /* CrumbTests */ = {
+			isa = PBXGroup;
+			children = (
+				DB89897B93CA012368DB1855 /* AskCrumbSessionTests.swift */,
+				4104E341280EF5C3408942F7 /* ForegroundSelectionTests.swift */,
+				55496A18F9C4AABD602C0F84 /* LibraryMergeTests.swift */,
+				BBC1F924CA237A8A01081909 /* LocalizationTests.swift */,
+				31E7F8AF71EEE62543088836 /* RecipeAssistantTests.swift */,
+				91B18CED8A5FC40D9E5D8A61 /* RecipeCategoryTests.swift */,
+				A60B23623DF93CB1B626EC43 /* RecipeImportTests.swift */,
+				045DCD29D6FF329A8E390D31 /* SubscriptionTests.swift */,
+			);
+			path = CrumbTests;
+			sourceTree = "<group>";
+		};
+		B3A579A832C1A9B0FE0931F4 /* EmptyStateArt */ = {
+			isa = PBXGroup;
+			children = (
+				A872713A912F2A849458567E /* crumb-food-thoughts.png */,
+				06673123C450F964D7DD93FB /* crumb-thought-frames.png */,
+			);
+			path = EmptyStateArt;
+			sourceTree = "<group>";
+		};
 		D9089B3298336A8994569ACC /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				37D1685F11BBD93FC9E85F2D /* crumb.app */,
+				64CF8BC822BD827FB10E03D3 /* CrumbShare.appex */,
+				334389DFCC71E43ED0C72D0A /* CrumbTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -195,6 +394,9 @@
 		E6CD1DBC9D117B2BA5B4D971 /* StandardPlates */ = {
 			isa = PBXGroup;
 			children = (
+				6E69376F02DF937A1B6F8955 /* ceramic-five.png */,
+				5293A58981F50CE86DFFE9A5 /* ceramic-green.png */,
+				49FF6FAC68C987952F62C0E5 /* ceramic-pair.png */,
 				D29806B4470FB6A1D2C6D8E3 /* standard-plate-01.png */,
 				C2028557F5AE7D10111A1566 /* standard-plate-02.png */,
 				88AF6C95E4FC5EC31F54156D /* standard-plate-03.png */,
@@ -223,10 +425,12 @@
 			buildPhases = (
 				F1A62D0A1725B8D2C3A51EAA /* Sources */,
 				A39A1BD925DF3B5EF7335723 /* Resources */,
+				A0197BC0E4215D609E5328F9 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				05AE98D4809E4441EF2FC050 /* PBXTargetDependency */,
 			);
 			name = crumb;
 			packageProductDependencies = (
@@ -234,6 +438,42 @@
 			productName = crumb;
 			productReference = 37D1685F11BBD93FC9E85F2D /* crumb.app */;
 			productType = "com.apple.product-type.application";
+		};
+		B8C781A99EF072D287E0A194 /* CrumbShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 21A311E4FEC98ACEDD9FCAE8 /* Build configuration list for PBXNativeTarget "CrumbShare" */;
+			buildPhases = (
+				103F29E4B9D237C76D1EEE6D /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CrumbShare;
+			packageProductDependencies = (
+			);
+			productName = CrumbShare;
+			productReference = 64CF8BC822BD827FB10E03D3 /* CrumbShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		CC91810AF723E2EED4398812 /* CrumbTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 34347244DD86947AD5F06285 /* Build configuration list for PBXNativeTarget "CrumbTests" */;
+			buildPhases = (
+				642707A20202FA46B4F8D2CA /* Sources */,
+				EE774478E55C50939D9D8EB2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				31712ABF6414E9E8F1C0ED93 /* PBXTargetDependency */,
+			);
+			name = CrumbTests;
+			packageProductDependencies = (
+			);
+			productName = CrumbTests;
+			productReference = 334389DFCC71E43ED0C72D0A /* CrumbTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -245,6 +485,12 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					0693FF7C5ADE62C6D99F1704 = {
+						DevelopmentTeam = DW8V3D3NS2;
+					};
+					B8C781A99EF072D287E0A194 = {
+						DevelopmentTeam = DW8V3D3NS2;
+					};
+					CC91810AF723E2EED4398812 = {
 						DevelopmentTeam = DW8V3D3NS2;
 					};
 				};
@@ -266,6 +512,8 @@
 			projectRoot = "";
 			targets = (
 				0693FF7C5ADE62C6D99F1704 /* crumb */,
+				B8C781A99EF072D287E0A194 /* CrumbShare */,
+				CC91810AF723E2EED4398812 /* CrumbTests */,
 			);
 		};
 /* End PBXProject section */
@@ -280,8 +528,7 @@
 				2FE1D5DA2A90A4CF0D092446 /* CrumbFace.png in Resources */,
 				C1AE7DEE80E85FB48922B7E1 /* CrumbIcon@2x.png in Resources */,
 				2A90EDC376E76190E10AA8AB /* CrumbIcon@3x.png in Resources */,
-				DDD789F07A420F0EF9CC560E /* InfoPlist.strings in Resources */,
-				B9B0F866D0F3790E831CBBC5 /* InfoPlist.strings in Resources */,
+				615F62214BD3CA5495114A7C /* InfoPlist.strings in Resources */,
 				30970ED5F44575646EE98167 /* Localizable.strings in Resources */,
 				4A4277A5E341022DC938DCE3 /* Nunito-Medium.ttf in Resources */,
 				7B89ABEE8C8C52C0A78C784F /* Nunito-OFL.txt in Resources */,
@@ -289,6 +536,13 @@
 				313B057B348A8238CE5C9755 /* Nunito-SemiBold.ttf in Resources */,
 				223EBD5F775A0BA64234114C /* OFL.txt in Resources */,
 				44EAA9A6BA8733662F1FB0AE /* carbonara.jpg in Resources */,
+				2F180757B4635ECBC060747F /* ceramic-five.png in Resources */,
+				4EAD040CD6DB05315B5FFC3C /* ceramic-green.png in Resources */,
+				4BEB99840F4ED1777C01E6C3 /* ceramic-pair.png in Resources */,
+				BBA0C7E7CAF0308C7296F787 /* crumb-cooking.png in Resources */,
+				0DAEC12440482FDD2BF19319 /* crumb-food-thoughts.png in Resources */,
+				023B7FF8A686E74A1936D745 /* crumb-thinking.png in Resources */,
+				AEE0C2A91B97A10648354438 /* crumb-thought-frames.png in Resources */,
 				D4E395E40BC8EAB6F903FB8C /* curry.jpg in Resources */,
 				1E3D1A9532639DCA2489BBE6 /* pudding.jpg in Resources */,
 				58E4C42C14B37673432D1013 /* standard-plate-01.png in Resources */,
@@ -306,46 +560,124 @@
 				E78E0507F73985CE5F976166 /* standard-plate-13.png in Resources */,
 				67D5EB6FFFC95F8C30D003FF /* standard-plate-14.png in Resources */,
 				6B349C12351EE44D1158DEFF /* standard-plate-15.png in Resources */,
+				43F00CF46904C6295D25B6E4 /* usda-foods.json in Resources */,
 				EF4F73740F3F2CE420373949 /* vegetables.jpg in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EE774478E55C50939D9D8EB2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				90CFA9FA36670A30C0869D7E /* Crumb.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		103F29E4B9D237C76D1EEE6D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3B77CC7FB1C410599732F839 /* RecipeInbox.swift in Sources */,
+				25603A0AFFCBB8B60E51CEAB /* ShareViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		642707A20202FA46B4F8D2CA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				34F04B5D0B350E1A60C61B58 /* AskCrumbSessionTests.swift in Sources */,
+				F33026CA57C1DD0D5079592E /* ForegroundSelectionTests.swift in Sources */,
+				8C5E5F036A0838166F30F277 /* LibraryMergeTests.swift in Sources */,
+				AA608DFA2C9995EFE6B94715 /* LocalizationTests.swift in Sources */,
+				579D0BF30CB45EE7BE3FB18D /* RecipeAssistantTests.swift in Sources */,
+				FE09DFAD5B763A122A230E3E /* RecipeCategoryTests.swift in Sources */,
+				47FA73A59F0E90DAAB4CCFA9 /* RecipeImportTests.swift in Sources */,
+				65DE00A1534F6842F9F67251 /* SubscriptionTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F1A62D0A1725B8D2C3A51EAA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				B3220EED99F6C8A6721155FA /* AccountSession.swift in Sources */,
 				4A6F366E70185DA2FE75FDBF /* AccountViews.swift in Sources */,
+				8407E96226558AB3D1676D70 /* AskCrumbView.swift in Sources */,
+				CB7E3C373A7B3BD11DE0A7A9 /* AssistantWaiting.swift in Sources */,
+				59B6A5EA16DFB5AF0792CAC2 /* AtlasTexture.swift in Sources */,
+				B8E94755661A23BFEDB8747E /* CategoryActions.swift in Sources */,
+				0D7311BDBB17A7EF4636ACF3 /* CloudLibrary.swift in Sources */,
 				FF8B916E209E5797F8E4FAD5 /* CrumbApp.swift in Sources */,
+				4BA49B4BFFC837519C313571 /* CrumbAssistant.swift in Sources */,
+				99625176261D550CE1F91D0D /* EmptyRecipeView.swift in Sources */,
+				15604ED832C46A01002A3D59 /* ForegroundSelection.swift in Sources */,
 				CEF8A8D1E39B9B56FDA8015A /* GuidedRecipeCamera.swift in Sources */,
 				3C15CF2C1980B7B901A7E917 /* HomePlateEditor.swift in Sources */,
+				767D48D48BA3C96362DEBCF0 /* LibraryMerge.swift in Sources */,
 				271CA8E4E5E87998347E0D65 /* MealDetail.swift in Sources */,
 				4EE3B4A0F2BA524EEA8D037A /* MealEditor.swift in Sources */,
 				E8F6D0734424CA0A79F8FE10 /* MealPhotoCropper.swift in Sources */,
+				83B71887D604405AE3A558D4 /* MealPlanViews.swift in Sources */,
 				25FF5986148061D176DC22E4 /* Meals.swift in Sources */,
+				FFBB5AA210E48D82823BAAD2 /* MenuBookViews.swift in Sources */,
+				55DB52329C1476E414B82C77 /* Nutrition.swift in Sources */,
+				285A86D58910A547697D6DC3 /* NutritionView.swift in Sources */,
 				0300D3E7D455D72AE812F81F /* PhotoPlating.swift in Sources */,
+				0A9132F55F58538F7BB74D42 /* PlanPolicy.swift in Sources */,
 				D110C8D0BF653595886F83F1 /* PlatePicker.swift in Sources */,
+				8F6CD8086EFEA33F3D4EDEB8 /* PlusStore.swift in Sources */,
+				26F5953ACC58D8DDA9AC8CAE /* PlusViews.swift in Sources */,
 				5E64FA2EB2D03016622446B6 /* ProfileView.swift in Sources */,
 				6F04E1566330622D56904463 /* Recipe.swift in Sources */,
+				8D985D82C3F9F539BFBC45AD /* RecipeCapture.swift in Sources */,
+				F434CBFCEED731894C3556EB /* RecipeDraft.swift in Sources */,
+				DD4BD5AC19818EE24204F25E /* RecipeImport.swift in Sources */,
+				644E7B026417044D940E47FF /* RecipeInbox.swift in Sources */,
 				4D7D054180303A24B06FF3BC /* RecipeMediaPicker.swift in Sources */,
 				8B76C1A646FF633A86718BB6 /* ShapePhotoEditor.swift in Sources */,
+				BFA44E29A292F2492941EBE1 /* SupabaseREST.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		05AE98D4809E4441EF2FC050 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B8C781A99EF072D287E0A194 /* CrumbShare */;
+			targetProxy = 637884221010BAF70629F2DF /* PBXContainerItemProxy */;
+		};
+		31712ABF6414E9E8F1C0ED93 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0693FF7C5ADE62C6D99F1704 /* crumb */;
+			targetProxy = 1C22CEC1596FDD12125058EB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		A4B4F27B77753119E2DD2358 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				9E56CFFAD11F7F1B4E797682 /* en */,
+				84D899AD14FECEFDE4E14116 /* en */,
 				D99D3F7A1CAAEE525E94F2F5 /* ja */,
 				96A773D8DBE389468CF64038 /* ko */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		A94E65F2CE45092E3A66578D /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D9747A9696A292949EDEC898 /* en */,
+				3EF3AA849CAC41568CE8CABE /* ja */,
+				5631CDD374EDD629ED3FA2E6 /* ko */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -405,6 +737,148 @@
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
+		};
+		0DA90BA3B55DEFB13C58699F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = CrumbShare.entitlements;
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				INFOPLIST_FILE = CrumbShareInfo.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.share;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1ADB3821F153D897EB0A08C2 /* Purchase Preview */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.tests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/crumb.app/crumb";
+			};
+			name = "Purchase Preview";
+		};
+		280BE0C53A9E1FA4121EE92F /* Purchase Preview */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = "Purchase Preview";
+		};
+		4DA3118952D9C37677D7850D /* Device Preview */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.tests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/crumb.app/crumb";
+			};
+			name = "Device Preview";
+		};
+		57DEC5738094E0C522012AE4 /* Purchase Preview */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "";
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				INFOPLIST_FILE = CrumbShareInfo.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.purchases.share;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Purchase Preview";
 		};
 		6112D812BB20F6138EBC5BB7 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -468,6 +942,26 @@
 			};
 			name = Debug;
 		};
+		6AAE9FC59E599A84C3E12019 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = CrumbShare.entitlements;
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				INFOPLIST_FILE = CrumbShareInfo.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.share;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		6E1D8AF2A04E6379E9F7BA8F /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 61D1C1D9AAEFD2C3E771191F /* Defaults.xcconfig */;
@@ -492,6 +986,33 @@
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
+		};
+		7456CAB0F2348D4AA097FBAA /* Purchase Preview */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 61D1C1D9AAEFD2C3E771191F /* Defaults.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CrumbInfo.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "crumb Purchases";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.purchases;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG CRUMB_STOREKIT_LOCAL";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = "Purchase Preview";
 		};
 		756E46D7CF9D0FAA74FA4BE0 /* Device Preview */ = {
 			isa = XCBuildConfiguration;
@@ -574,11 +1095,71 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.preview;
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals;
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) CRUMB_DEVICE_PREVIEW";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG CRUMB_DEVICE_PREVIEW";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = "Device Preview";
+		};
+		B42363E7DE391DF4C781AFB6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.tests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/crumb.app/crumb";
+			};
+			name = Debug;
+		};
+		D0CF9D699305E45B6C80393D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.tests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/crumb.app/crumb";
+			};
+			name = Release;
+		};
+		F4DE1AF4368CF4A9ADFF8C4A /* Device Preview */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "";
+				DEVELOPMENT_TEAM = DW8V3D3NS2;
+				INFOPLIST_FILE = CrumbShareInfo.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tabinote.meals.share;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = "Device Preview";
 		};
@@ -610,12 +1191,35 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		21A311E4FEC98ACEDD9FCAE8 /* Build configuration list for PBXNativeTarget "CrumbShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0DA90BA3B55DEFB13C58699F /* Debug */,
+				F4DE1AF4368CF4A9ADFF8C4A /* Device Preview */,
+				57DEC5738094E0C522012AE4 /* Purchase Preview */,
+				6AAE9FC59E599A84C3E12019 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		324BFB736A91DBB227088C1C /* Build configuration list for PBXProject "crumb" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6112D812BB20F6138EBC5BB7 /* Debug */,
 				756E46D7CF9D0FAA74FA4BE0 /* Device Preview */,
+				280BE0C53A9E1FA4121EE92F /* Purchase Preview */,
 				01E5CB88F72C0FA65A96E0BD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		34347244DD86947AD5F06285 /* Build configuration list for PBXNativeTarget "CrumbTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B42363E7DE391DF4C781AFB6 /* Debug */,
+				4DA3118952D9C37677D7850D /* Device Preview */,
+				1ADB3821F153D897EB0A08C2 /* Purchase Preview */,
+				D0CF9D699305E45B6C80393D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -625,6 +1229,7 @@
 			buildConfigurations = (
 				F68AE409BFC75D68560C46A4 /* Debug */,
 				8D0E3C4AB689B5CC742CB7DF /* Device Preview */,
+				7456CAB0F2348D4AA097FBAA /* Purchase Preview */,
 				6E1D8AF2A04E6379E9F7BA8F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;

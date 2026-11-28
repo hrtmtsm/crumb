@@ -5,7 +5,7 @@ import PhotosUI
 struct PlatePlacement: Equatable {
     var x = 0.0
     var y = 0.0
-    var scale = 0.64
+    var scale = 0.70
 }
 
 struct PlateOption: Identifiable {
@@ -14,15 +14,36 @@ struct PlateOption: Identifiable {
     let photo: Data
     var placement = PlatePlacement()
 
+    // Original reference sheets remain unchanged. Crop their individual textures when loading the picker.
     static let standard: [Self] = [
-        "紺の太縁", "藍の連続模様", "深緑の二重線", "青の太線", "朱の点模様",
-        "青の三重線", "紫の波縁", "藍の植物模様", "オリーブの縁",
-        "藍の唐草", "若草の波縁", "青の二重線", "赤の波縁", "小さな赤い花", "淡い桃色の花"
-    ].enumerated().compactMap { index, name in
-        let key = String(format: "standard-plate-%02d", index + 1)
-        guard let url = Bundle.main.url(forResource: key, withExtension: "png"),
+        atlasPlate("ceramic-green", "深緑の輪花", source: "ceramic-green", canvas: CGSize(width: 1254, height: 1254), rect: CGRect(x: 64, y: 64, width: 1128, height: 1128), placement: PlatePlacement(x: 0, y: 0.015, scale: 0.72)),
+        atlasPlate("ceramic-vines", "藍の花唐草", source: "ceramic-five", canvas: CGSize(width: 1536, height: 1024), rect: CGRect(x: 502, y: 12, width: 510, height: 510), placement: PlatePlacement(scale: 0.82)),
+        atlasPlate("ceramic-crest", "藍の三つ紋", source: "ceramic-five", canvas: CGSize(width: 1536, height: 1024), rect: CGRect(x: 1038, y: 35, width: 470, height: 480), placement: PlatePlacement(scale: 0.82)),
+        atlasPlate("ceramic-blue-flower", "青い芥子の花", source: "ceramic-five", canvas: CGSize(width: 1536, height: 1024), rect: CGRect(x: 229, y: 507, width: 500, height: 500), placement: PlatePlacement(scale: 0.82)),
+        atlasPlate("ceramic-rose", "桃色の花と赤い縁", source: "ceramic-five", canvas: CGSize(width: 1536, height: 1024), rect: CGRect(x: 769, y: 507, width: 500, height: 500), placement: PlatePlacement(scale: 0.82)),
+        atlasPlate("ceramic-celadon", "青磁の角皿", source: "ceramic-pair", canvas: CGSize(width: 1774, height: 887), rect: CGRect(x: 70, y: 70, width: 750, height: 750), placement: PlatePlacement(scale: 0.76)),
+        atlasPlate("ceramic-imari", "藍と金の輪花", source: "ceramic-pair", canvas: CGSize(width: 1774, height: 887), rect: CGRect(x: 910, y: 50, width: 800, height: 800), placement: PlatePlacement(scale: 0.80))
+    ].compactMap { $0 }
+
+    private static func atlasPlate(_ id: String, _ name: String, source: String, canvas: CGSize, rect: CGRect, placement: PlatePlacement) -> Self? {
+        guard let url = Bundle.main.url(forResource: source, withExtension: "png"),
+              let image = UIImage(contentsOfFile: url.path)?.cgImage else { return nil }
+        let pixels = CGRect(x: rect.minX * CGFloat(image.width) / canvas.width,
+                            y: rect.minY * CGFloat(image.height) / canvas.height,
+                            width: rect.width * CGFloat(image.width) / canvas.width,
+                            height: rect.height * CGFloat(image.height) / canvas.height).integral
+        guard let crop = image.cropping(to: pixels), let isolated = AtlasTexture.isolate(crop),
+              let photo = UIImage(cgImage: isolated).pngData() else { return nil }
+        return Self(id: id, name: name, photo: photo, placement: placement)
+    }
+
+    // Existing recipes keep their previous plate when reopened for editing; only the new set appears in the picker.
+    static func resolve(_ id: String) -> Self? {
+        if let plate = standard.first(where: { $0.id == id }) { return plate }
+        guard id.range(of: "^standard-plate-(0[1-9]|1[0-5])$", options: .regularExpression) != nil,
+              let url = Bundle.main.url(forResource: id, withExtension: "png"),
               let data = try? Data(contentsOf: url) else { return nil }
-        return Self(id: key, name: name, photo: data)
+        return Self(id: id, name: AppLanguage.text("以前のお皿"), photo: data)
     }
 
     init(id: String, name: String, photo: Data, placement: PlatePlacement = .init()) {
@@ -34,13 +55,13 @@ struct PlateOption: Identifiable {
 
     @MainActor init(plate: HomePlate, number: Int) {
         id = plate.identifier?.uuidString ?? "legacy-\(plate.persistentModelID)"
-        name = "マイお皿 \(number)"
+        name = AppLanguage.format("マイお皿 %lld", Int64(number))
         if plate.photo.isPlatedPhoto {
             photo = plate.photo
         } else {
             photo = (try? PlatingImage.crop(plate.photo, shape: "丸", rim: .clear)) ?? plate.photo
         }
-        placement = PlatePlacement(x: plate.foodX ?? 0, y: plate.foodY ?? 0, scale: plate.foodScale ?? 0.64)
+        placement = PlatePlacement(x: plate.foodX ?? 0, y: plate.foodY ?? 0, scale: plate.foodScale ?? 0.70)
     }
 }
 
@@ -75,7 +96,7 @@ struct PlatePicker: View {
     }
 
     private var selectedPlate: PlateOption? {
-        (custom + PlateOption.standard).first { $0.id == selectedID }
+        custom.first { $0.id == selectedID } ?? selectedID.flatMap(PlateOption.resolve)
     }
 
     private var columns: [GridItem] {
@@ -101,14 +122,15 @@ struct PlatePicker: View {
                         Text("料理を切り抜けませんでした。元の写真に戻すこともできます。")
                             .font(.footnote)
                         HStack {
-                            Button("もう一度試す") { attempt += 1 }
-                            Button("写真をそのまま盛る") {
+                            Button("もう一度試す") { CrumbHaptics.tap(); attempt += 1 }
+                            Button("写真をそのまま盛る") { CrumbHaptics.tap();
                                 subject = try? PlatingImage.crop(original, shape: "角丸", rim: .clear)
                                 failed = subject == nil
                             }
                         }
                     }
-                    Button {
+                    Button { CrumbHaptics.tap();
+                        if selectedID != nil { CrumbHaptics.selection() }
                         selectedID = nil
                     } label: {
                         Label("なし", systemImage: selectedID == nil ? "checkmark.circle.fill" : "photo")
@@ -118,7 +140,7 @@ struct PlatePicker: View {
                     .buttonStyle(.plain)
                     Text("マイお皿").font(.headline)
                     LazyVGrid(columns: columns, spacing: 10) {
-                        Button { addingPlate = true } label: {
+                        Button { CrumbHaptics.tap(); CrumbHaptics.add(); addingPlate = true } label: {
                             VStack(spacing: 6) {
                                 Image(systemName: "plus")
                                 Text("お皿を追加").font(.caption2)
@@ -142,10 +164,10 @@ struct PlatePicker: View {
             .navigationTitle("お皿を変える")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("閉じる") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button("閉じる") { CrumbHaptics.tap(); dismiss() } }
             }
             .safeAreaInset(edge: .bottom) {
-                Button(LocalizedStringKey(selectedID == nil ? "お皿なしにする" : "このお皿にする")) {
+                Button(LocalizedStringKey(selectedID == nil ? "お皿なしにする" : "このお皿にする")) { CrumbHaptics.tap();
                     if selectedID == nil {
                         onApply(nil, original)
                     } else if let selectedPlate, let subject {
@@ -171,7 +193,7 @@ struct PlatePicker: View {
                 }
             }
             .alert("盛り付けを反映できませんでした", isPresented: $compositionError) {
-                Button("閉じる", role: .cancel) {}
+                Button("閉じる", role: .cancel) { CrumbHaptics.tap() }
             }
             .task(id: attempt) {
                 working = true
@@ -184,7 +206,11 @@ struct PlatePicker: View {
     }
 
     private func plateTile(_ plate: PlateOption) -> some View {
-        Button { selectedID = plate.id } label: {
+        Button { CrumbHaptics.tap();
+            guard selectedID != plate.id else { return }
+            CrumbHaptics.selection()
+            selectedID = plate.id
+        } label: {
             MealPhoto(data: plate.photo, size: 160, contentMode: .fit)
                 .aspectRatio(1, contentMode: .fit)
                 .padding(4)
@@ -195,7 +221,7 @@ struct PlatePicker: View {
                 }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(plate.name)
+        .accessibilityLabel(Text(AppLanguage.text(plate.name)))
         .accessibilityAddTraits(selectedID == plate.id ? .isSelected : [])
     }
 }
@@ -237,11 +263,11 @@ enum PlateRendering {
     }
 
     @MainActor static func normalize(_ image: UIImage) -> Data {
-        let side: CGFloat = 576
+        let side: CGFloat = 1200
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
         return UIGraphicsImageRenderer(size: CGSize(width: side, height: side), format: format).pngData { _ in
-            image.draw(in: fitted(image.size, inside: 515, center: CGPoint(x: side / 2, y: side / 2)))
+            image.draw(in: fitted(image.size, inside: 1073, center: CGPoint(x: side / 2, y: side / 2)))
         }
     }
 

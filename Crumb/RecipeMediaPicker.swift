@@ -42,10 +42,10 @@ struct RecipeMediaPicker: View {
                         Spacer()
                         PhotosPicker(selection: $pickerItem, matching: .images) {
                             Label("写真を選ぶ", systemImage: "photo.on.rectangle").font(.subheadline)
-                        }
+                        }.hapticActivation()
                     }.padding(.horizontal, 17).padding(.vertical, 18)
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 2), count: 3), spacing: 2) {
-                        Button { openCamera() } label: {
+                        Button { CrumbHaptics.tap(); openCamera() } label: {
                             Rectangle().fill(Color(white: 0.13)).aspectRatio(0.85, contentMode: .fit)
                                 .overlay {
                                     VStack(spacing: 10) {
@@ -55,7 +55,7 @@ struct RecipeMediaPicker: View {
                                 }
                         }.buttonStyle(.plain)
                         ForEach(assets, id: \.localIdentifier) { asset in
-                            Button { load(asset) } label: { RecipeAssetThumbnail(asset: asset) }.buttonStyle(.plain)
+                            Button { CrumbHaptics.tap(); load(asset) } label: { RecipeAssetThumbnail(asset: asset) }.buttonStyle(.plain)
                         }
                     }
                     if status == .denied || status == .restricted {
@@ -71,7 +71,7 @@ struct RecipeMediaPicker: View {
                 .toolbarBackground(.black, for: .navigationBar).toolbarBackground(.visible, for: .navigationBar)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button { dismiss() } label: { Image(systemName: "xmark").foregroundStyle(.white) }
+                        Button { CrumbHaptics.tap(); dismiss() } label: { Image(systemName: "xmark").foregroundStyle(.white) }
                             .accessibilityLabel("キャンセル")
                     }
                 }
@@ -101,7 +101,7 @@ struct RecipeMediaPicker: View {
                     .ignoresSafeArea()
                 }
                 .alert("写真を追加", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
-                    Button("閉じる", role: .cancel) {}
+                    Button("閉じる", role: .cancel) { CrumbHaptics.tap() }
                 } message: { Text(AppLanguage.text(error ?? "")) }
         }.preferredColorScheme(.dark)
     }

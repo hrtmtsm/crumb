@@ -1,0 +1,4 @@
+"NSCameraUsageDescription" = "ガイドに合わせて料理やお皿を撮影し、レシピに保存します。";
+"NSPhotoLibraryUsageDescription" = "レシピに使う料理写真を選びます。";
+"NSSpeechRecognitionUsageDescription" = "材料や作り方を音声で入力します。対応端末では端末内で文字に変換します。";
+"NSMicrophoneUsageDescription" = "材料や作り方の音声入力にマイクを使います。";

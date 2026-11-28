@@ -1,3 +1,9 @@
+// Turn on only after deploying the authenticated ask-crumb function.
+CRUMB_AI_ENABLED = NO
+// Enable only after the library migration and receipt verifier are deployed.
+CRUMB_CLOUD_ENABLED = NO
+CRUMB_PRIVACY_URL =
+CRUMB_TERMS_URL =
 // Public client configuration. The optional local override is ignored by git.
 SUPABASE_URL = https:/$()/ennerbywpvdcmpqaohmf.supabase.co
 SUPABASE_PUBLISHABLE_KEY =

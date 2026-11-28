@@ -1,3 +1,4 @@
+import UIKit
 import SwiftUI
 import SwiftData
 import MapKit
@@ -187,7 +188,7 @@ enum Samples {
 }
 
 func crumbFont(_ size: CGFloat) -> Font {
-    .custom("BricolageGrotesque-48ptBold", size: size, relativeTo: .largeTitle)
+    .custom("Nunito-SemiBold", size: size, relativeTo: .largeTitle)
 }
 
 enum RecipeCategories {
@@ -207,6 +208,9 @@ enum RecipeCategories {
             return clean
         }
     }
+    static func replacing(_ old: String, with replacement: String?, in names: [String]) -> [String] {
+        normalized(names.compactMap { matches($0, old) ? replacement : $0 })
+    }
     static func matches(_ lhs: String, _ rhs: String) -> Bool {
         lhs.compare(rhs, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame
     }
@@ -215,8 +219,12 @@ enum RecipeCategories {
 struct MenuBook: Codable, Identifiable, Equatable {
     var id: String
     var name: String
+    var cloudID: UUID?
+    var ownerID: UUID?
+    var ownerHasPlus: Bool?
+    var revision: Int?
     static let defaultID = "default"
-    static let defaultBook = MenuBook(id: defaultID, name: "My Menu")
+    static var defaultBook: MenuBook { MenuBook(id: defaultID, name: AppLanguage.text("My Menu")) }
     static func decode(_ value: String) -> [MenuBook] {
         let saved = value.data(using: .utf8).flatMap { try? JSONDecoder().decode([MenuBook].self, from: $0) } ?? []
         var ids: Set<String> = [defaultID]
@@ -226,4 +234,61 @@ struct MenuBook: Codable, Identifiable, Equatable {
         guard let data = try? JSONEncoder().encode(books.filter { $0.id != defaultID }) else { return "[]" }
         return String(decoding: data, as: UTF8.self)
     }
+}
+
+@MainActor
+enum CrumbHaptics {
+    static let preferenceKey = "hapticsEnabled"
+    private static var pendingTap: DispatchWorkItem?
+    private static var lastEmission: TimeInterval = 0
+    private static var tapGeneration = 0
+    private static var enabled: Bool { UserDefaults.standard.object(forKey: preferenceKey) as? Bool ?? true }
+
+    static func action(_ perform: @escaping () -> Void) -> () -> Void {
+        { tap(); perform() }
+    }
+
+    static func tap() {
+        pendingTap?.cancel()
+        tapGeneration += 1
+        let generation = tapGeneration
+        // Selection/success in the action replaces this generic tap before the next run loop.
+        let work = DispatchWorkItem {
+            guard generation == tapGeneration else { return }
+            pendingTap = nil
+            guard enabled, Date.timeIntervalSinceReferenceDate - lastEmission > 0.04 else { return }
+            lastEmission = Date.timeIntervalSinceReferenceDate
+            UIImpactFeedbackGenerator(style: .light).impactOccurred(intensity: 0.7)
+        }
+        pendingTap = work
+        DispatchQueue.main.async(execute: work)
+    }
+    static func selection() {
+        pendingTap?.cancel(); pendingTap = nil
+        tapGeneration += 1
+        guard enabled else { return }
+        lastEmission = Date.timeIntervalSinceReferenceDate
+        UISelectionFeedbackGenerator().selectionChanged()
+    }
+    static func add() { tap() }
+    static func success() {
+        pendingTap?.cancel(); pendingTap = nil
+        tapGeneration += 1
+        guard enabled else { return }
+        lastEmission = Date.timeIntervalSinceReferenceDate
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+    }
+}
+
+private struct HapticActivation: ViewModifier {
+    @Environment(\.isEnabled) private var isEnabled
+    func body(content: Content) -> some View {
+        content.simultaneousGesture(TapGesture().onEnded {
+            if isEnabled { CrumbHaptics.tap() }
+        })
+    }
+}
+
+extension View {
+    func hapticActivation() -> some View { modifier(HapticActivation()) }
 }

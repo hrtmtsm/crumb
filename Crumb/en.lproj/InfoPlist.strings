@@ -1,2 +1,4 @@
 "NSCameraUsageDescription" = "Take food and plate photos for your recipes.";
 "NSPhotoLibraryUsageDescription" = "Choose food photos for your recipes.";
+"NSSpeechRecognitionUsageDescription" = "Enter ingredients and directions by voice using on-device speech recognition.";
+"NSMicrophoneUsageDescription" = "Use the microphone to dictate ingredients and directions.";

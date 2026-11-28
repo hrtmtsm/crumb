@@ -79,15 +79,15 @@ struct ShapePhotoEditor: View {
                     }
                     Text("枠の中をドラッグして移動。ピンチでも拡大・縮小できます。")
                         .font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center).padding(.horizontal, 20)
-                    Button("リセット") { zoom = 1; offset = .zero }
+                    Button("リセット") { CrumbHaptics.tap(); zoom = 1; offset = .zero }
                     Spacer(minLength: 0)
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             }.background(paper.ignoresSafeArea())
                 .navigationTitle("写真の位置を調整").navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    ToolbarItem(placement: .cancellationAction) { Button("キャンセル") { dismiss() } }
+                    ToolbarItem(placement: .cancellationAction) { Button("キャンセル") { CrumbHaptics.tap(); dismiss() } }
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("適用") {
+                        Button("適用") { CrumbHaptics.tap();
                             let value = PhotoFrame(shape: shape, rim: "", zoom: Double(zoom), x: Double(offset.width), y: Double(offset.height))
                             do {
                                 let data = try PlatingImage.crop(original, shape: shape, rim: rim, frame: value)
@@ -96,7 +96,7 @@ struct ShapePhotoEditor: View {
                         }
                     }
                 }
-                .alert("写真を調整できませんでした", isPresented: $failed) { Button("閉じる", role: .cancel) {} }
+                .alert("写真を調整できませんでした", isPresented: $failed) { Button("閉じる", role: .cancel) { CrumbHaptics.tap() } }
         }.preferredColorScheme(.light)
     }
     private func fitted(_ size: CGSize, side: CGFloat, zoom: CGFloat) -> CGSize {
@@ -133,7 +133,7 @@ struct ShapeCropSource: View {
                         else { ProgressView("写真を準備しています") }
                     }.frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(paper)
-                        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("キャンセル") { dismiss() } } }
+                        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("キャンセル") { CrumbHaptics.tap(); dismiss() } } }
                 }
             }
         }.task {

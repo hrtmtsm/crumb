@@ -68,17 +68,25 @@ Deno.serve(async (request: Request) => {
     const admin = createClient(url, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    // Use a flat <user UUID>/<photo UUID> storage layout. Refuse unknown/nested files instead of leaving private data behind.
-    while (true) {
-      const { data: files, error: listError } = await admin.storage.from(
-        "crumb-photos",
-      ).list(user.id, { limit: 100, offset: 0 });
-      if (listError) return failure(502);
-      if (!files?.length) break;
-      if (files.some((file) => !file.id)) return failure(409);
-      const { error: removeError } = await admin.storage.from("crumb-photos")
-        .remove(files.map((file) => `${user.id}/${file.name}`));
-      if (removeError) return failure(502);
+    // Stop new cloud writes before clearing immutable media. Invited books belong to their owners.
+    const { error: revokePlanError } = await admin.from("crumb_plan_access").update({ revoked: true }).eq("user_id", user.id);
+    if (revokePlanError) return failure(502);
+    const folders = [`u/${user.id}`, user.id]; // Include the previous flat layout for older test installs.
+    for (let offset = 0;; offset += 100) {
+      const { data: books, error: booksError } = await admin.from("crumb_books").select("id").eq("owner_id", user.id).range(offset, offset + 99);
+      if (booksError) return failure(502);
+      for (const book of books ?? []) folders.push(`b/${book.id}`);
+      if (!books || books.length < 100) break;
+    }
+    for (const folder of folders) {
+      while (true) {
+        const { data: files, error: listError } = await admin.storage.from("crumb-photos").list(folder, { limit: 100, offset: 0 });
+        if (listError) return failure(502);
+        if (!files?.length) break;
+        if (files.some(file => !file.id)) return failure(409);
+        const { error: removeError } = await admin.storage.from("crumb-photos").remove(files.map(file => `${folder}/${file.name}`));
+        if (removeError) return failure(502);
+      }
     }
     const { error: deleteError } = await admin.auth.admin.deleteUser(user.id);
     if (deleteError) return failure(502);

@@ -111,6 +111,7 @@ final class AccountStore: ObservableObject {
     @Published private(set) var busy = false
     @Published var error: String?
     private var nonce: String?
+    private var refreshTask: Task<AccountSession, Error>?
     var configured: Bool { SupabaseConfiguration.current != nil }
     var scope: String { session?.userID.uuidString.lowercased() ?? "guest" }
     var signedIn: Bool { session != nil }
@@ -170,16 +171,26 @@ final class AccountStore: ObservableObject {
     func validSession() async throws -> AccountSession {
         guard let saved = session else { throw AccountError.expired }
         if saved.expiresAt > Date().addingTimeInterval(60) { return saved }
-        let data = try await call("auth/v1/token?grant_type=refresh_token", body: ["refresh_token": saved.refreshToken])
-        let next = try JSONDecoder().decode(TokenResponse.self, from: data).session(appleID: saved.appleUserID, name: saved.displayName)
-        try SessionKeychain.save(next)
-        session = next
-        return next
+        if let refreshTask { return try await refreshTask.value }
+        let task = Task { @MainActor in
+            let data = try await self.call("auth/v1/token?grant_type=refresh_token", body: ["refresh_token": saved.refreshToken])
+            try Task.checkCancellation()
+            guard self.session?.userID == saved.userID else { throw CancellationError() }
+            let next = try JSONDecoder().decode(TokenResponse.self, from: data).session(appleID: saved.appleUserID, name: saved.displayName)
+            try SessionKeychain.save(next)
+            self.session = next
+            return next
+        }
+        refreshTask = task
+        defer { refreshTask = nil }
+        return try await task.value
     }
 
     func signOut() async {
         guard !busy else { return }
         busy = true
+        refreshTask?.cancel()
+        refreshTask = nil
         defer { busy = false }
         do {
             if let saved = session {
@@ -214,6 +225,8 @@ final class AccountStore: ObservableObject {
     }
 
     func credentialsRevoked() {
+        refreshTask?.cancel()
+        refreshTask = nil
         do { try SessionKeychain.clear(); session = nil }
         catch { self.error = AccountError.storage.localizedDescription }
     }
